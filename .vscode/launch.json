@@ -1,0 +1,35 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Individual",
+            "request": "launch",
+            "mainClass": "com.margozzi.ancestry.model.Individual",
+            "projectName": "ancestry-utility_38c25759"
+        },
+        {
+            "type": "java",
+            "name": "Launch Utility",
+            "request": "launch",
+            "mainClass": "com.margozzi.ancestry.Utility",
+            "projectName": "ancestry-utility_38c25759"
+        },
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch Ancestry",
+            "request": "launch",
+            "mainClass": "com.margozzi.ancestry.Utility",
+            "projectName": "ancestry-utility_38c25759"
+        }
+    ]
+}

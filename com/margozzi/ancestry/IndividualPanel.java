@@ -11,9 +11,7 @@ public class IndividualPanel extends JPanel {
     public IndividualPanel(Individual individual) {
         JTextArea textArea = new JTextArea(individual.toString());
         textArea.setBackground(Color.yellow);
+        // textArea.setSize(400, 100);
         this.add(textArea);
     }
 }
- 
-
-    

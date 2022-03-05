@@ -1,5 +1,6 @@
 package com.margozzi.ancestry;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -7,7 +8,6 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -21,7 +21,7 @@ public class Utility {
 
         // Create and set up the window.
         frame = new JFrame("Ancestry Utility");
-        frame.setSize(800, 800);
+        frame.setMinimumSize(new Dimension(600, 400));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(buildMenu());
 
@@ -45,6 +45,7 @@ public class Utility {
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+                    frame.getContentPane().removeAll();
                     DuplicatePanel duplicatePanel = new DuplicatePanel(selectedFile.getAbsolutePath());
                     frame.getContentPane().add(duplicatePanel);
                 }

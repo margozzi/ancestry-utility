@@ -3,6 +3,8 @@ package com.margozzi.ancestry.file;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 import com.margozzi.ancestry.model.Individual;
@@ -12,6 +14,7 @@ public class Reader {
     private ArrayList<Individual> individuals = new ArrayList<Individual>();
     private int countMale = 0;
     private int countFemale = 0;
+    private int idIdx, genderIdx, firstNameIdx, middleNameIdx, lastNameIdx, birthDateIdx, deathDateIdx;
 
     public Reader(String filePath) {
         this.filePath = filePath;
@@ -22,8 +25,16 @@ public class Reader {
             File file = new File(filePath);
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
-                if (scanner.nextLine().equals("[Individuals]")) {
-                    scanner.nextLine(); // Eat the labels
+                if (scanner.nextLine().startsWith("[Individuals]")) {
+                    String[] labels = scanner.nextLine().split("\t");
+                    List<String> list = Arrays.asList(labels);
+                    idIdx = list.indexOf("ID");
+                    genderIdx = list.indexOf("Gender");
+                    firstNameIdx = list.indexOf("Name.First");
+                    middleNameIdx = list.indexOf("Name.Middle");
+                    lastNameIdx = list.indexOf("Name.Last");
+                    birthDateIdx = list.indexOf("Birth.Date");
+                    deathDateIdx = list.indexOf("Death.Date");
                     break;
                 }
             }
@@ -41,8 +52,13 @@ public class Reader {
                     } else {
                         countFemale++;
                     }
-                    Individual individual = Individual.createNewInstance(tokens[0], tokens[1], tokens[2], tokens[3],
-                            tokens[4], tokens[8]);
+                    if (tokens[firstNameIdx].length() == 0 && tokens[middleNameIdx].length() == 0
+                            && tokens[lastNameIdx].length() == 0) {
+                        continue;
+                    }
+                    Individual individual = Individual.createNewInstance(tokens[idIdx], tokens[genderIdx],
+                            tokens[firstNameIdx], tokens[middleNameIdx],
+                            tokens[lastNameIdx], tokens[birthDateIdx]);
                     individuals.add(individual);
                 }
             }

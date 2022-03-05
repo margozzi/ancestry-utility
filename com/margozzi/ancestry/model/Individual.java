@@ -89,15 +89,15 @@ public final class Individual {
         return lastName;
     }
 
-    public int getBirthDateDay() {
+    public Integer getBirthDateDay() {
         return birthDateDay;
     }
 
-    public int getBirthDateMonth() {
+    public Integer getBirthDateMonth() {
         return birthDateMonth;
     }
 
-    public int getBirthDateYear() {
+    public Integer getBirthDateYear() {
         return birthDateYear;
     }
 

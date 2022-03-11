@@ -15,10 +15,20 @@ public final class Individual {
     private final Integer birthDateDay;
     private final Integer birthDateMonth;
     private final Integer birthDateYear;
+    private final Integer deathDateDay;
+    private final Integer deathDateMonth;
+    private final Integer deathDateYear;
+    private final String motherId;
+    private final String fatherId;
+
+    private String motherFullName;
+    private String fatherFullName;
 
     // Default private constructor will ensure no unplanned construction of class
     private Individual(String id, String gender, String firstName, String middleName,
-            String lastName, Integer birthDateDay, Integer birthDateMonth, Integer birthDateYear) {
+            String lastName, Integer birthDateDay, Integer birthDateMonth, Integer birthDateYear, Integer deathDateDay,
+            Integer deathDateMonth, Integer deathDateYear,
+            String motherId, String fatherId) {
         this.id = id;
         this.gender = gender;
         this.firstName = firstName;
@@ -27,15 +37,23 @@ public final class Individual {
         this.birthDateDay = birthDateDay;
         this.birthDateMonth = birthDateMonth;
         this.birthDateYear = birthDateYear;
+        this.deathDateDay = deathDateDay;
+        this.deathDateMonth = deathDateMonth;
+        this.deathDateYear = deathDateYear;
+        this.motherId = motherId;
+        this.fatherId = fatherId;
     }
 
     // Factory method to store object creation logic in single place
     public static Individual createNewInstance(String id, String gender, String firstName,
-            String middleName, String lastName, String birthDate) {
+            String middleName, String lastName, String birthDate, String deathDate, String motherId,
+            String fatherId) {
 
-        Integer[] numericDate = parseDateString(birthDate);
-        return (new Individual(id, gender, firstName, middleName, lastName, numericDate[0], numericDate[1],
-                numericDate[2]));
+        Integer[] numericBirthDate = parseDateString(birthDate);
+        Integer[] numericDeathDate = parseDateString(deathDate);
+        return (new Individual(id, gender, firstName, middleName, lastName, numericBirthDate[0], numericBirthDate[1],
+                numericBirthDate[2], numericDeathDate[0], numericDeathDate[1],
+                numericDeathDate[2], motherId, fatherId));
     }
 
     private static Integer[] parseDateString(String birthDate) {
@@ -89,6 +107,17 @@ public final class Individual {
         return lastName;
     }
 
+    public String getFullName() {
+        String name = "";
+        if (firstName != null)
+            name += firstName;
+        if (middleName != null)
+            name += " " + middleName;
+        if (lastName != null)
+            name += " " + lastName;
+        return (name);
+    }
+
     public Integer getBirthDateDay() {
         return birthDateDay;
     }
@@ -99,6 +128,42 @@ public final class Individual {
 
     public Integer getBirthDateYear() {
         return birthDateYear;
+    }
+
+    public Integer getDeathDateDay() {
+        return deathDateDay;
+    }
+
+    public Integer getDeathDateMonth() {
+        return deathDateMonth;
+    }
+
+    public Integer getDeathDateYear() {
+        return deathDateYear;
+    }
+
+    public String getMotherId() {
+        return motherId;
+    }
+
+    public String getMotherFullName() {
+        return motherFullName;
+    }
+
+    public void setMotherFullName(String name) {
+        motherFullName = name;
+    }
+
+    public String getFatherId() {
+        return fatherId;
+    }
+
+    public String getFatherFullName() {
+        return fatherFullName;
+    }
+
+    public void setFatherFullName(String name) {
+        fatherFullName = name;
     }
 
     @Override
@@ -112,15 +177,30 @@ public final class Individual {
             individual += " " + lastName;
         individual += "\n";
         individual += gender.equalsIgnoreCase("m") ? "Male" : "Female";
-        individual += "\nBorn ";
+        individual += "\n";
+        individual += "Born ";
         if (birthDateDay != null)
             individual += birthDateDay + "-";
         if (birthDateMonth != null)
             individual += birthDateMonth + "-";
         if (birthDateYear != null)
-            individual += birthDateYear + "\n\n";
+            individual += birthDateYear;
         if (birthDateDay == null && birthDateMonth == null && birthDateYear == null)
-            individual += "Unknown" + "\n\n";
+            individual += "Unknown";
+
+        individual += "\nDied ";
+        if (deathDateDay != null)
+            individual += deathDateDay + "-";
+        if (deathDateMonth != null)
+            individual += deathDateMonth + "-";
+        if (deathDateYear != null)
+            individual += deathDateYear;
+        if (deathDateDay == null && deathDateMonth == null && deathDateYear == null)
+            individual += "Unknown";
+
+        individual += "\nMother  " + motherId;
+        individual += "\nFather  " + fatherId;
+
         return individual;
     }
 

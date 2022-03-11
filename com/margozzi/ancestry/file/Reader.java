@@ -2,8 +2,8 @@ package com.margozzi.ancestry.file;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -11,10 +11,11 @@ import com.margozzi.ancestry.model.Individual;
 
 public class Reader {
     private String filePath;
-    private ArrayList<Individual> individuals = new ArrayList<Individual>();
+    private HashMap<String, Individual> individuals = new HashMap<String, Individual>();
     private int countMale = 0;
     private int countFemale = 0;
     private int idIdx, genderIdx, firstNameIdx, middleNameIdx, lastNameIdx, birthDateIdx, deathDateIdx;
+    private int fatherIdx, motherIdx;
 
     public Reader(String filePath) {
         this.filePath = filePath;
@@ -35,6 +36,8 @@ public class Reader {
                     lastNameIdx = list.indexOf("Name.Last");
                     birthDateIdx = list.indexOf("Birth.Date");
                     deathDateIdx = list.indexOf("Death.Date");
+                    fatherIdx = list.indexOf("Fathers");
+                    motherIdx = list.indexOf("Mothers");
                     break;
                 }
             }
@@ -44,7 +47,7 @@ public class Reader {
                     break; // Reached a new section.
                 }
                 String[] tokens = data.split("\t");
-                if (tokens.length < 9) {
+                if (tokens.length < 13) {
                     System.out.println("Bad line in file: " + data);
                 } else {
                     if (tokens[1].equalsIgnoreCase("M")) {
@@ -58,8 +61,9 @@ public class Reader {
                     }
                     Individual individual = Individual.createNewInstance(tokens[idIdx], tokens[genderIdx],
                             tokens[firstNameIdx], tokens[middleNameIdx],
-                            tokens[lastNameIdx], tokens[birthDateIdx]);
-                    individuals.add(individual);
+                            tokens[lastNameIdx], tokens[birthDateIdx], tokens[deathDateIdx], tokens[fatherIdx],
+                            tokens[motherIdx]);
+                    individuals.put(individual.getId(), individual);
                 }
             }
             scanner.close();
@@ -69,7 +73,7 @@ public class Reader {
         }
     }
 
-    public ArrayList<Individual> getIndividuals() {
+    public HashMap<String, Individual> getIndividuals() {
         return individuals;
     }
 

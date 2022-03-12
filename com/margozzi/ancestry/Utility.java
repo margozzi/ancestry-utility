@@ -21,7 +21,7 @@ public class Utility {
 
         // Create and set up the window.
         frame = new JFrame("Ancestry Utility");
-        frame.setMinimumSize(new Dimension(600, 400));
+        frame.setPreferredSize(new Dimension(600, 600));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(buildMenu());
 

@@ -1,7 +1,6 @@
 package com.margozzi.ancestry;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
@@ -140,56 +139,59 @@ public class DuplicatePanel extends JPanel {
         final AtomicInteger numDupsHolder = new AtomicInteger();
         ArrayList<IndividualPanel> panels = new ArrayList<IndividualPanel>();
         ArrayList<GridBagConstraints> constraints = new ArrayList<GridBagConstraints>();
-        // Object[] noDuplicates = removeDuplicates(result);
-        result.entrySet().forEach(entry -> {
-            entry.getValue().forEach(match -> {
-                GridBagConstraints c = new GridBagConstraints();
-                c.gridx = 0;
-                c.weightx = 0;
-                int y = yHolder.getAndIncrement();
-                c.gridy = y;
-                panels.add(new IndividualPanel(individuals.get(match.getData().getKey())));
-                constraints.add(c);
-                c = new GridBagConstraints();
-                c.gridx = 1;
-                c.weightx = 0;
-                c.gridy = y++;
-                panels.add(new IndividualPanel(individuals.get(match.getMatchedWith().getKey())));
-                constraints.add(c);
-                numDupsHolder.incrementAndGet();
+        List<Match<Document>> noDuplicates = removeDuplicates(result);
+        noDuplicates.forEach(match -> {
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridx = 0;
+            int y = yHolder.getAndIncrement();
+            c.gridy = y;
+            panels.add(new IndividualPanel(individuals.get(match.getData().getKey())));
+            constraints.add(c);
+            c = new GridBagConstraints();
+            c.gridx = 1;
+            c.gridy = y++;
+            panels.add(new IndividualPanel(individuals.get(match.getMatchedWith().getKey())));
+            constraints.add(c);
+            numDupsHolder.incrementAndGet();
 
-                System.out.println(match.getData().getKey() + ": " + match.getData() + " Matched: " + match
-                        .getMatchedWith().getKey() + ": " + match.getMatchedWith() + " Score: "
-                        + match.getScore().getResult());
-
-            });
+            System.out.println(match.getData().getKey() + ": " + match.getData() + " Matched: " + match
+                    .getMatchedWith().getKey() + ": " + match.getMatchedWith() + " Score: "
+                    + match.getScore().getResult());
         });
 
         System.out.println("Duplicates: " + numDupsHolder.get());
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                JScrollPane scrollPane = new JScrollPane();
                 JPanel resultPanel = new JPanel(new GridBagLayout());
-                resultPanel.setPreferredSize(new Dimension(300, 400));
                 for (int i = 0; i < panels.size(); i++) {
                     resultPanel.add(panels.get(i), constraints.get(i));
                 }
+                JScrollPane scrollPane = new JScrollPane(resultPanel);
+                // scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+                ;
                 panel.add(scrollPane, BorderLayout.CENTER);
             }
         });
     }
 
-    private Object[] removeDuplicates(Map<String, List<Match<Document>>> result) {
-        @SuppressWarnings("unchecked")
-        Map<String, List<Match<Document>>>[] data = (Map<String, List<Match<Document>>>[]) (result.entrySet()
-                .toArray());
-        for (int i = 0; i < data.length; i++) {
-            for (int j = i + 1; j < data.length; j++) {
-                Map<String, List<Match<Document>>> left = data[i];
-                Map<String, List<Match<Document>>> right = data[j];
+    private List<Match<Document>> removeDuplicates(Map<String, List<Match<Document>>> result) {
+        ArrayList<Match<Document>> data = new ArrayList<Match<Document>>();
+        result.entrySet().forEach(entry -> {
+            entry.getValue().forEach(match -> {
+                data.add(match);
+            });
+        });
+        for (int i = 0; i < data.size(); i++) {
+            String leftKey = data.get(i).getData().getKey();
+            String rightKey = data.get(i).getMatchedWith().getKey();
+            for (int j = i + 1; j < data.size(); j++) {
+                String leftKeyMatch = data.get(j).getData().getKey();
+                String rightKeyMatch = data.get(j).getMatchedWith().getKey();
+                if (leftKey.equals(rightKeyMatch) && rightKey.equals(leftKeyMatch)) {
+                    data.remove(j);
+                }
             }
         }
-
         return data;
     }
 }

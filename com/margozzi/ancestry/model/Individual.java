@@ -175,8 +175,7 @@ public final class Individual {
             individual += " " + middleName;
         if (lastName != null)
             individual += " " + lastName;
-        individual += "\n";
-        individual += gender.equalsIgnoreCase("m") ? "Male" : "Female";
+
         individual += "\n";
         individual += "Born ";
         if (birthDateDay != null)
@@ -185,8 +184,6 @@ public final class Individual {
             individual += birthDateMonth + "-";
         if (birthDateYear != null)
             individual += birthDateYear;
-        if (birthDateDay == null && birthDateMonth == null && birthDateYear == null)
-            individual += "Unknown";
 
         individual += "\nDied ";
         if (deathDateDay != null)
@@ -195,8 +192,6 @@ public final class Individual {
             individual += deathDateMonth + "-";
         if (deathDateYear != null)
             individual += deathDateYear;
-        if (deathDateDay == null && deathDateMonth == null && deathDateYear == null)
-            individual += "Unknown";
 
         individual += "\nMother  " + motherId;
         individual += "\nFather  " + fatherId;

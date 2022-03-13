@@ -3,6 +3,8 @@ package com.margozzi.ancestry.model;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public final class Individual {
@@ -20,15 +22,21 @@ public final class Individual {
     private final Integer deathDateYear;
     private final String motherId;
     private final String fatherId;
+    private final String siblingIds;
+    private final String childrenIds;
 
     private String motherFullName;
     private String fatherFullName;
+    private String siblingFirstNames;
+    private String childrenFirstNames;
+    private List<String> siblingsNames = new ArrayList<String>();
+    private List<String> childrenNames = new ArrayList<String>();;
 
     // Default private constructor will ensure no unplanned construction of class
     private Individual(String id, String gender, String firstName, String middleName,
             String lastName, Integer birthDateDay, Integer birthDateMonth, Integer birthDateYear, Integer deathDateDay,
             Integer deathDateMonth, Integer deathDateYear,
-            String motherId, String fatherId) {
+            String motherId, String fatherId, String siblingIds, String childrenIds) {
         this.id = id;
         this.gender = gender;
         this.firstName = firstName;
@@ -42,23 +50,25 @@ public final class Individual {
         this.deathDateYear = deathDateYear;
         this.motherId = motherId;
         this.fatherId = fatherId;
+        this.siblingIds = siblingIds;
+        this.childrenIds = childrenIds;
     }
 
     // Factory method to store object creation logic in single place
     public static Individual createNewInstance(String id, String gender, String firstName,
             String middleName, String lastName, String birthDate, String deathDate, String motherId,
-            String fatherId) {
+            String fatherId, String siblingIds, String childrenIds) {
 
         Integer[] numericBirthDate = parseDateString(birthDate);
         Integer[] numericDeathDate = parseDateString(deathDate);
         return (new Individual(id, gender, firstName, middleName, lastName, numericBirthDate[0], numericBirthDate[1],
                 numericBirthDate[2], numericDeathDate[0], numericDeathDate[1],
-                numericDeathDate[2], motherId, fatherId));
+                numericDeathDate[2], motherId, fatherId, siblingIds, childrenIds));
     }
 
     private static Integer[] parseDateString(String birthDate) {
         Integer[] triplet = new Integer[3];
-        if (birthDate != null) {
+        if (birthDate != null && birthDate.length() > 0) {
             try {
                 String[] tokens = birthDate.trim().split("\\s+|~|-");
                 if (tokens.length != 0) { // No Date
@@ -166,6 +176,38 @@ public final class Individual {
         fatherFullName = name;
     }
 
+    public String getSiblingIds() {
+        return siblingIds;
+    }
+
+    public String getChildrenIds() {
+        return childrenIds;
+    }
+
+    public String getSiblingsFirstNames() {
+        return siblingFirstNames;
+    }
+
+    public void setSiblingFirstNames(String names) {
+        siblingFirstNames = names;
+    }
+
+    public String getChildrenFirstNames() {
+        return childrenFirstNames;
+    }
+
+    public void setChildrenFirstNames(String names) {
+        childrenFirstNames = names;
+    }
+
+    public void addSiblingName(String name) {
+        siblingsNames.add(name);
+    }
+
+    public void addChildName(String name) {
+        childrenNames.add(name);
+    }
+
     @Override
     public String toString() {
         String individual = id;
@@ -177,7 +219,7 @@ public final class Individual {
             individual += " " + lastName;
 
         individual += "\n";
-        individual += "Born ";
+        individual += "Born: ";
         if (birthDateDay != null)
             individual += birthDateDay + "-";
         if (birthDateMonth != null)
@@ -185,7 +227,7 @@ public final class Individual {
         if (birthDateYear != null)
             individual += birthDateYear;
 
-        individual += "\nDied ";
+        individual += "\nDied: ";
         if (deathDateDay != null)
             individual += deathDateDay + "-";
         if (deathDateMonth != null)
@@ -193,8 +235,11 @@ public final class Individual {
         if (deathDateYear != null)
             individual += deathDateYear;
 
-        individual += "\nMother  " + motherId;
-        individual += "\nFather  " + fatherId;
+        individual += "\nMother:  " + motherId;
+        individual += "\nFather:  " + fatherId;
+
+        individual += "\nSiblings: " + siblingFirstNames;
+        individual += "\nChildren: " + childrenFirstNames;
 
         return individual;
     }

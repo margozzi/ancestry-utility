@@ -17,8 +17,7 @@ public class IndividualPanel extends JPanel {
         JTextArea textArea = new JTextArea(individual.toString());
         textArea.setBackground(individual.getGender().equalsIgnoreCase("M") ? boy : girl);
         textArea.setFont(new Font(Font.DIALOG, Font.BOLD, 12));
-        // textArea.setMinimumSize(new Dimension(125, 65));
-        textArea.setPreferredSize(new Dimension(250, 105));
+        textArea.setPreferredSize(new Dimension(250, 140));
         textArea.setMargin(new Insets(5, 10, 5, 10));
         this.add(textArea);
     }

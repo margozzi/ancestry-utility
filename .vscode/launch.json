@@ -6,13 +6,6 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Launch Test",
-            "request": "launch",
-            "mainClass": "com.margozzi.ancestry.Test",
-            "projectName": "ancestry-utility_38c25759"
-        },
-        {
-            "type": "java",
             "name": "Launch Current File",
             "request": "launch",
             "mainClass": "${file}"

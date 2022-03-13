@@ -15,7 +15,7 @@ public class Reader {
     private int countMale = 0;
     private int countFemale = 0;
     private int idIdx, genderIdx, firstNameIdx, middleNameIdx, lastNameIdx, birthDateIdx, deathDateIdx;
-    private int fatherIdx, motherIdx;
+    private int fatherIdx, motherIdx, siblingIdx, childrenIdx;
 
     public Reader(String filePath) {
         this.filePath = filePath;
@@ -38,6 +38,8 @@ public class Reader {
                     deathDateIdx = list.indexOf("Death.Date");
                     fatherIdx = list.indexOf("Fathers");
                     motherIdx = list.indexOf("Mothers");
+                    siblingIdx = list.indexOf("Siblings");
+                    childrenIdx = list.indexOf("Children");
                     break;
                 }
             }
@@ -47,27 +49,55 @@ public class Reader {
                     break; // Reached a new section.
                 }
                 String[] tokens = data.split("\t");
-                if (tokens.length < 13) {
-                    System.out.println("Bad line in file: " + data);
-                } else {
-                    if (tokens[1].equalsIgnoreCase("M")) {
+                int numTokens = tokens.length;
+
+                String id = numTokens > idIdx ? tokens[idIdx] : null;
+                if (id == null) {
+                    System.out.println("No ID for " + data);
+                    continue;
+                }
+
+                String gender = numTokens > genderIdx ? tokens[genderIdx] : null;
+                if (gender != null) {
+                    if (gender.equalsIgnoreCase("M")) {
                         countMale++;
                     } else {
                         countFemale++;
                     }
-                    if (tokens[firstNameIdx].length() == 0 && tokens[middleNameIdx].length() == 0
-                            && tokens[lastNameIdx].length() == 0) {
-                        continue;
-                    }
-                    Individual individual = Individual.createNewInstance(tokens[idIdx], tokens[genderIdx],
-                            tokens[firstNameIdx], tokens[middleNameIdx],
-                            tokens[lastNameIdx], tokens[birthDateIdx], tokens[deathDateIdx], tokens[fatherIdx],
-                            tokens[motherIdx]);
-                    individuals.put(individual.getId(), individual);
+                } else {
+                    System.out.println("No gender for: " + data);
+                    continue;
                 }
+
+                String firstName = numTokens > firstNameIdx ? tokens[firstNameIdx] : null;
+                String middleName = numTokens > middleNameIdx ? tokens[middleNameIdx] : null;
+                String lastName = numTokens > lastNameIdx ? tokens[lastNameIdx] : null;
+                if (firstName == null || firstName.length() == 0) {
+                    if (middleName == null || middleName.length() == 0) {
+                        if (lastName == null || lastName.length() == 0) {
+                            System.out.println("No name for: " + tokens[idIdx]);
+                            continue;
+                        }
+                    }
+                }
+
+                String birthDate = numTokens > birthDateIdx ? tokens[birthDateIdx] : null;
+                String deathDate = numTokens > deathDateIdx ? tokens[deathDateIdx] : null;
+
+                String father = numTokens > fatherIdx ? tokens[fatherIdx] : null;
+                String mother = numTokens > motherIdx ? tokens[motherIdx] : null;
+
+                String siblings = numTokens > siblingIdx ? tokens[siblingIdx] : null;
+                String children = numTokens > childrenIdx ? tokens[childrenIdx] : null;
+
+                Individual individual = Individual.createNewInstance(id, gender, firstName,
+                        middleName, lastName, birthDate, deathDate, mother, father, siblings, children);
+                individuals.put(individual.getId(), individual);
             }
             scanner.close();
-        } catch (FileNotFoundException e) {
+        } catch (
+
+        FileNotFoundException e) {
             System.out.println("Not able to open the file");
             e.printStackTrace();
         }

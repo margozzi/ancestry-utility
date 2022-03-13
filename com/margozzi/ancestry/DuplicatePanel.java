@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -24,9 +25,12 @@ public class DuplicatePanel extends JPanel {
 
     private final JPanel panel = this;
     private String filePath;
+    private HashMap<String, Individual> individuals;
 
     public DuplicatePanel(String filePath) {
         this.setLayout(new BorderLayout());
+        this.add(new JLabel("Loading ..."), BorderLayout.NORTH);
+        // this.revalidate();
         this.filePath = filePath;
         Thread t = new Thread() {
             public void run() {
@@ -40,41 +44,19 @@ public class DuplicatePanel extends JPanel {
         Reader reader = new Reader(filePath);
         reader.read();
 
-        HashMap<String, Individual> individuals = reader.getIndividuals();
+        individuals = reader.getIndividuals();
         System.out.println("File: " + filePath);
         System.out.println("Individuals: " + individuals.size());
         System.out.println("Males: " + reader.getCountMale());
         System.out.println("Females: " + reader.getCountFemale());
 
         List<Document> documentList = new ArrayList<Document>();
+        // Augment Individuals with extra information.
         individuals.forEach((id, individual) -> {
-            String motherId = individual.getMotherId();
-            if (motherId != null && motherId.length() > 0) {
-                Individual mom = individuals.get(motherId);
-                if (mom != null && mom.getFullName() != null) {
-                    individual.setMotherFullName(mom.getFullName());
-                } else {
-                    individual.setMotherFullName("");
-                    System.out.println("Mother not foud: " + motherId);
-                }
-            } else {
-                individual.setMotherFullName("");
-                System.out.println("No mother id for: " + id);
-            }
-
-            String fatherId = individual.getFatherId();
-            if (fatherId != null && fatherId.length() > 0) {
-                Individual dad = individuals.get(fatherId);
-                if (dad != null && dad.getFullName() != null) {
-                    individual.setFatherFullName(dad.getFullName());
-                } else {
-                    individual.setFatherFullName("");
-                    System.out.println("Father not foud: " + fatherId);
-                }
-            } else {
-                individual.setFatherFullName("");
-                System.out.println("No father id for: " + id);
-            }
+            setMothersFullName(individual);
+            setFathersFullName(individual);
+            setSiblingsFirstNames(individual);
+            setChildrenFirstNames(individual);
 
             documentList.add(
                     new Document.Builder(id)
@@ -94,7 +76,7 @@ public class DuplicatePanel extends JPanel {
                                     .setValue(individual.getMiddleName())
                                     .setVariance("MiddleName")
                                     .setType(ElementType.NAME)
-                                    .setWeight(0.3)
+                                    .setWeight(0.2)
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getLastName())
@@ -128,7 +110,19 @@ public class DuplicatePanel extends JPanel {
                                     .setType(ElementType.NAME)
                                     .setWeight(0.3)
                                     .createElement())
-                            .setThreshold(0.9)
+                            .addElement(new Element.Builder<String>()
+                                    .setValue(individual.getSiblingsFirstNames())
+                                    .setVariance("Siblings")
+                                    .setType(ElementType.NAME)
+                                    .setWeight(0.1)
+                                    .createElement())
+                            .addElement(new Element.Builder<String>()
+                                    .setValue(individual.getChildrenFirstNames())
+                                    .setVariance("Children")
+                                    .setType(ElementType.NAME)
+                                    .setWeight(0.1)
+                                    .createElement())
+                            .setThreshold(0.8)
                             .createDocument());
         });
 
@@ -154,7 +148,7 @@ public class DuplicatePanel extends JPanel {
             constraints.add(c);
             numDupsHolder.incrementAndGet();
 
-            System.out.println(match.getData().getKey() + ": " + match.getData() + " Matched: " + match
+            System.out.println(match.getData().getKey() + ": " + match.getData() + "Matched: " + match
                     .getMatchedWith().getKey() + ": " + match.getMatchedWith() + " Score: "
                     + match.getScore().getResult());
         });
@@ -166,10 +160,10 @@ public class DuplicatePanel extends JPanel {
                 for (int i = 0; i < panels.size(); i++) {
                     resultPanel.add(panels.get(i), constraints.get(i));
                 }
+                panel.removeAll();
                 JScrollPane scrollPane = new JScrollPane(resultPanel);
-                // scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-                ;
                 panel.add(scrollPane, BorderLayout.CENTER);
+                panel.revalidate();
             }
         });
     }
@@ -193,5 +187,63 @@ public class DuplicatePanel extends JPanel {
             }
         }
         return data;
+    }
+
+    private void setMothersFullName(Individual individual) {
+        String motherId = individual.getMotherId();
+        if (motherId != null && motherId.length() > 0) {
+            Individual mom = this.individuals.get(motherId);
+            if (mom != null && mom.getFullName() != null) {
+                individual.setMotherFullName(mom.getFullName());
+            } else {
+                individual.setMotherFullName("");
+            }
+        } else {
+            individual.setMotherFullName("");
+        }
+    }
+
+    private void setFathersFullName(Individual individual) {
+        String fatherId = individual.getFatherId();
+        if (fatherId != null && fatherId.length() > 0) {
+            Individual dad = individuals.get(fatherId);
+            if (dad != null && dad.getFullName() != null) {
+                individual.setFatherFullName(dad.getFullName());
+            } else {
+                individual.setFatherFullName("");
+            }
+        } else {
+            individual.setFatherFullName("");
+        }
+    }
+
+    private void setSiblingsFirstNames(Individual individual) {
+        String siblingFirstNames = "";
+        String siblingIds = individual.getSiblingIds();
+        if (siblingIds != null && siblingIds.length() > 0) {
+            String[] tokens = siblingIds.split(", ");
+            for (String siblingId : tokens) {
+                Individual sibling = individuals.get(siblingId);
+                if (sibling != null && sibling.getFirstName() != null) {
+                    siblingFirstNames += sibling.getFirstName() + " ";
+                }
+            }
+        }
+        individual.setSiblingFirstNames(siblingFirstNames);
+    }
+
+    private void setChildrenFirstNames(Individual individual) {
+        String childrenFirstNames = "";
+        String childrenIds = individual.getChildrenIds();
+        if (childrenIds != null && childrenIds.length() > 0) {
+            String[] tokens = childrenIds.split(", ");
+            for (String childId : tokens) {
+                Individual child = individuals.get(childId);
+                if (child != null && child.getFirstName() != null) {
+                    childrenFirstNames += child.getFirstName() + " ";
+                }
+            }
+        }
+        individual.setChildrenFirstNames(childrenFirstNames);
     }
 }

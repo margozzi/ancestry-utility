@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch AdvancedPanel",
+            "request": "launch",
+            "mainClass": "com.margozzi.ancestry.duplicate.AdvancedPanel",
+            "projectName": "ancestry-utility_38c25759"
+        },
+        {
+            "type": "java",
+            "name": "Launch SearchPanel",
+            "request": "launch",
+            "mainClass": "com.margozzi.ancestry.duplicate.SearchPanel",
+            "projectName": "ancestry-utility_38c25759"
+        },
+        {
+            "type": "java",
             "name": "Launch Current File",
             "request": "launch",
             "mainClass": "${file}"

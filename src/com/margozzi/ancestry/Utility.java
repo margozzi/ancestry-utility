@@ -1,16 +1,17 @@
 package com.margozzi.ancestry;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
 
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+
+import com.margozzi.ancestry.duplicate.DuplicatePanel;
 
 public class Utility {
     private static JFrame frame;
@@ -21,7 +22,8 @@ public class Utility {
 
         // Create and set up the window.
         frame = new JFrame("Ancestry Utility");
-        frame.setPreferredSize(new Dimension(600, 600));
+        frame.setPreferredSize(new Dimension(700, 600));
+        frame.setMinimumSize(new Dimension(700, 550));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(buildMenu());
 
@@ -39,16 +41,10 @@ public class Utility {
         JMenuItem menuItem = new JMenuItem("Find Duplicates", KeyEvent.VK_F);
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-                int result = fileChooser.showOpenDialog(frame);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    File selectedFile = fileChooser.getSelectedFile();
-                    System.out.println("Selected file: " + selectedFile.getAbsolutePath());
-                    frame.getContentPane().removeAll();
-                    DuplicatePanel duplicatePanel = new DuplicatePanel(selectedFile.getAbsolutePath());
-                    frame.getContentPane().add(duplicatePanel);
-                }
+                frame.getContentPane().removeAll();
+                DuplicatePanel duplicatePanel = new DuplicatePanel();
+                frame.getContentPane().add(duplicatePanel, BorderLayout.NORTH);
+                frame.revalidate();
             }
         });
         menu.add(menuItem);

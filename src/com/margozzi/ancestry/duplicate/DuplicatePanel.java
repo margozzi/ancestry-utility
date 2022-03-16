@@ -1,15 +1,15 @@
-package com.margozzi.ancestry;
+package com.margozzi.ancestry.duplicate;
 
-import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -21,31 +21,29 @@ import com.intuit.fuzzymatcher.domain.Match;
 import com.margozzi.ancestry.file.Reader;
 import com.margozzi.ancestry.model.Individual;
 
-public class DuplicatePanel extends JPanel {
+public class DuplicatePanel extends JPanel implements SearchPanelListener {
 
     private final JPanel panel = this;
-    private String filePath;
     private HashMap<String, Individual> individuals;
+    private SearchPanel searchPanel = new SearchPanel(this);
+    private AdvancedPanel advancedPanel = new AdvancedPanel();
+    private boolean advancedVisible = false;
+    private JScrollPane scrollPane;
 
-    public DuplicatePanel(String filePath) {
-        this.setLayout(new BorderLayout());
-        this.add(new JLabel("Loading ..."), BorderLayout.NORTH);
-        // this.revalidate();
-        this.filePath = filePath;
-        Thread t = new Thread() {
-            public void run() {
-                load();
-            }
-        };
-        t.start();
+    public DuplicatePanel() {
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.PAGE_START;
+        this.add(searchPanel, c);
     }
 
-    private void load() {
-        Reader reader = new Reader(filePath);
+    private void load(File file) {
+        Reader reader = new Reader(file);
         reader.read();
 
         individuals = reader.getIndividuals();
-        System.out.println("File: " + filePath);
         System.out.println("Individuals: " + individuals.size());
         System.out.println("Males: " + reader.getCountMale());
         System.out.println("Females: " + reader.getCountFemale());
@@ -160,9 +158,14 @@ public class DuplicatePanel extends JPanel {
                 for (int i = 0; i < panels.size(); i++) {
                     resultPanel.add(panels.get(i), constraints.get(i));
                 }
-                panel.removeAll();
-                JScrollPane scrollPane = new JScrollPane(resultPanel);
-                panel.add(scrollPane, BorderLayout.CENTER);
+                if (scrollPane != null) {
+                    panel.remove(scrollPane);
+                }
+                scrollPane = new JScrollPane(resultPanel);
+                GridBagConstraints c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = 2;
+                panel.add(scrollPane, c);
                 panel.revalidate();
             }
         });
@@ -245,5 +248,31 @@ public class DuplicatePanel extends JPanel {
             }
         }
         individual.setChildrenFirstNames(childrenFirstNames);
+    }
+
+    @Override
+    public void handleSearch() {
+        Thread t = new Thread() {
+            public void run() {
+                load(searchPanel.getSelectedFile());
+            }
+        };
+        t.start();
+
+    }
+
+    @Override
+    public void handleAdvanced(ActionEvent e) {
+        if (advancedVisible) {
+            this.remove(advancedPanel);
+            advancedVisible = false;
+        } else {
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = 1;
+            this.add(advancedPanel, c);
+            advancedVisible = true;
+        }
+        this.revalidate();
     }
 }

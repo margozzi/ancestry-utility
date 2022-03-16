@@ -10,20 +10,19 @@ import java.util.Scanner;
 import com.margozzi.ancestry.model.Individual;
 
 public class Reader {
-    private String filePath;
+    private File file;
     private HashMap<String, Individual> individuals = new HashMap<String, Individual>();
     private int countMale = 0;
     private int countFemale = 0;
     private int idIdx, genderIdx, firstNameIdx, middleNameIdx, lastNameIdx, birthDateIdx, deathDateIdx;
     private int fatherIdx, motherIdx, siblingIdx, childrenIdx;
 
-    public Reader(String filePath) {
-        this.filePath = filePath;
+    public Reader(File file) {
+        this.file = file;
     }
 
     public void read() {
         try {
-            File file = new File(filePath);
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
                 if (scanner.nextLine().startsWith("[Individuals]")) {

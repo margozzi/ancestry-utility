@@ -1,4 +1,4 @@
-package com.margozzi.ancestry;
+package com.margozzi.ancestry.duplicate;
 
 import javax.swing.JPanel;
 import javax.swing.JTextArea;

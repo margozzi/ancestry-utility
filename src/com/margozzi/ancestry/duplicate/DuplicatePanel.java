@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JPanel;
@@ -25,12 +26,16 @@ public class DuplicatePanel extends JPanel implements SearchPanelListener {
 
     private final JPanel panel = this;
     private HashMap<String, Individual> individuals;
-    private SearchPanel searchPanel = new SearchPanel(this);
-    private AdvancedPanel advancedPanel = new AdvancedPanel();
+    private SearchPanel searchPanel;
+    private AdvancedPanel advancedPanel;
     private boolean advancedVisible = false;
     private JScrollPane scrollPane;
+    private Properties properties;
 
-    public DuplicatePanel() {
+    public DuplicatePanel(Properties properties) {
+        this.properties = properties;
+        searchPanel = new SearchPanel(this, properties);
+        advancedPanel = new AdvancedPanel(properties);
         this.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -62,65 +67,65 @@ public class DuplicatePanel extends JPanel implements SearchPanelListener {
                                     .setValue(individual.getGender())
                                     .setVariance("Gender")
                                     .setType(ElementType.TEXT)
-                                    .setWeight(0.3)
+                                    .setWeight(getWeight("genderWeight"))
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getFirstName())
                                     .setVariance("FirstName")
                                     .setType(ElementType.NAME)
-                                    .setWeight(0.5)
+                                    .setWeight(getWeight("firstNameWeight"))
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getMiddleName())
                                     .setVariance("MiddleName")
                                     .setType(ElementType.NAME)
-                                    .setWeight(0.2)
+                                    .setWeight(getWeight("middleNameWeight"))
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getLastName())
                                     .setVariance("LastName")
                                     .setType(ElementType.NAME)
-                                    .setWeight(0.5)
+                                    .setWeight(getWeight("lastNameWeight"))
                                     .createElement())
                             .addElement(new Element.Builder<Integer>()
                                     .setValue(individual.getBirthDateYear())
                                     .setVariance("Birth")
                                     .setType(ElementType.NUMBER)
-                                    .setWeight(0.3)
+                                    .setWeight(getWeight("birthWeight"))
                                     .setNeighborhoodRange(0.999)
                                     .createElement())
                             .addElement(new Element.Builder<Integer>()
                                     .setValue(individual.getDeathDateYear())
                                     .setVariance("Death")
                                     .setType(ElementType.NUMBER)
-                                    .setWeight(0.3)
+                                    .setWeight(getWeight("deathWeight"))
                                     .setNeighborhoodRange(0.999)
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getMotherFullName())
                                     .setVariance("MotherName")
                                     .setType(ElementType.NAME)
-                                    .setWeight(0.3)
+                                    .setWeight(getWeight("motherWeight"))
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getFatherFullName())
                                     .setVariance("FatherName")
                                     .setType(ElementType.NAME)
-                                    .setWeight(0.3)
+                                    .setWeight(getWeight("fatherWeight"))
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getSiblingsFirstNames())
                                     .setVariance("Siblings")
                                     .setType(ElementType.NAME)
-                                    .setWeight(0.1)
+                                    .setWeight(getWeight("siblingWeight"))
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getChildrenFirstNames())
                                     .setVariance("Children")
                                     .setType(ElementType.NAME)
-                                    .setWeight(0.1)
+                                    .setWeight(getWeight("childrenWeight"))
                                     .createElement())
-                            .setThreshold(0.8)
+                            .setThreshold(getWeight("threshold"))
                             .createDocument());
         });
 
@@ -169,6 +174,11 @@ public class DuplicatePanel extends JPanel implements SearchPanelListener {
                 panel.revalidate();
             }
         });
+    }
+
+    private double getWeight(String key) {
+        String stringValue = properties.getProperty(key);
+        return (Integer.parseInt(stringValue) / 100.0);
     }
 
     private List<Match<Document>> removeDuplicates(Map<String, List<Match<Document>>> result) {

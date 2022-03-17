@@ -9,6 +9,8 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import com.margozzi.ancestry.Utility;
+
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -16,8 +18,10 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Properties;
 
 public class SearchPanel extends JPanel {
+    Properties properties;
     File selectedFile;
     private JTextField fileTextField;
     JSlider thresholdSlider;
@@ -25,11 +29,13 @@ public class SearchPanel extends JPanel {
     JButton advancedButton;
     JButton searchButton;
 
-    public SearchPanel(SearchPanelListener listener) {
+    public SearchPanel(SearchPanelListener listener, Properties properties) {
         super(new GridBagLayout());
+        this.properties = properties;
         JLabel fileLabel = new JLabel("File");
         fileLabel.setHorizontalAlignment(SwingConstants.LEFT);
         fileTextField = new JTextField("Click the browse button -->", 20);
+        fileTextField.setEditable(false);
         browseButton = new JButton("Browse...");
         browseButton.addActionListener(new ActionListener() {
             @Override
@@ -50,6 +56,7 @@ public class SearchPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 advancedButton.setText(advancedButton.getText().equals("Advanced") ? "Basic" : "Advanced");
+                advancedButton.setPreferredSize(browseButton.getSize());
                 if (listener != null) {
                     listener.handleAdvanced(e);
                 }
@@ -65,64 +72,73 @@ public class SearchPanel extends JPanel {
                 }
             }
         });
+        searchButton.setEnabled(false);
 
         Insets insets = new Insets(5, 10, 5, 10);
+        Insets bottomInsets = new Insets(5, 10, 15, 10);
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
         c.insets = insets;
         c.anchor = GridBagConstraints.PAGE_START;
-        this.add(fileLabel, c);
+        this.add(searchButton, c);
 
         c = new GridBagConstraints();
         c.gridx = 1;
+        c.gridy = 0;
+        c.insets = insets;
+
+        this.add(fileLabel, c);
+
+        c = new GridBagConstraints();
+        c.gridx = 2;
         c.gridy = 0;
         c.insets = insets;
         this.add(fileTextField, c);
 
         c = new GridBagConstraints();
-        c.gridx = 2;
+        c.gridx = 3;
         c.gridy = 0;
         c.insets = insets;
         this.add(browseButton, c);
 
         c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 1;
-        c.insets = insets;
-        this.add(thresholdLabel, c);
-
-        c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 1;
-        c.insets = insets;
-        this.add(thresholdSlider, c);
+        c.insets = bottomInsets;
+        this.add(thresholdLabel, c);
 
         c = new GridBagConstraints();
         c.gridx = 2;
         c.gridy = 1;
-        c.insets = insets;
-        this.add(advancedButton, c);
+        c.insets = bottomInsets;
+        this.add(thresholdSlider, c);
 
         c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridwidth = 3;
-        c.gridy = 2;
-        c.insets = insets;
-        this.add(searchButton, c);
+        c.gridx = 3;
+        c.gridy = 1;
+        c.insets = bottomInsets;
+        this.add(advancedButton, c);
     }
 
     private void handleBrowse() {
         browseButton.setEnabled((false));
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-        browseButton.setEnabled((true));
+        String dir = this.properties.getProperty("lastFileDirectory");
+        if (dir.equals("user.home")) {
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+        } else {
+            fileChooser.setCurrentDirectory(new File(dir));
+        }
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             selectedFile = fileChooser.getSelectedFile();
             fileTextField.setText(selectedFile.getName());
+            properties.setProperty("lastFileDirectory", selectedFile.getPath());
+            searchButton.setEnabled(true);
         }
+        browseButton.setEnabled((true));
     }
 
     public File getSelectedFile() {
@@ -135,7 +151,7 @@ public class SearchPanel extends JPanel {
 
     public static void main(String[] args) {
         JFrame frame = new JFrame();
-        frame.getContentPane().add(new SearchPanel(null), BorderLayout.NORTH);
+        frame.getContentPane().add(new SearchPanel(null, Utility.getDefaultProperties()), BorderLayout.NORTH);
         frame.pack();
         frame.setVisible(true);
     }

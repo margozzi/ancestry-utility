@@ -3,6 +3,10 @@ package com.margozzi.ancestry.duplicate;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Properties;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -10,8 +14,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
+import com.margozzi.ancestry.Utility;
+
 public class AdvancedPanel extends JPanel {
 
+    private Properties properties;
     private JSlider genderSlider;
     private JSlider firstNameSlider;
     private JSlider middleNameSlider;
@@ -25,46 +32,60 @@ public class AdvancedPanel extends JPanel {
 
     public static void main(String[] args) {
         JFrame frame = new JFrame();
-        frame.getContentPane().add(new AdvancedPanel());
+        frame.getContentPane().add(new AdvancedPanel(Utility.getDefaultProperties()));
         frame.pack();
         frame.setVisible(true);
     }
 
-    public AdvancedPanel() {
+    public AdvancedPanel(Properties properties) {
         super(new GridBagLayout());
+        this.properties = properties;
 
         JLabel genderLabel = new JLabel("Gender");
-        genderSlider = buildSlider(30);
+        genderSlider = buildSlider(getWeight("genderWeight"));
 
         JLabel firstNameLabel = new JLabel("First Name");
-        firstNameSlider = buildSlider(50);
+        firstNameSlider = buildSlider(getWeight("firstNameWeight"));
 
         JLabel middleNameLabel = new JLabel("Middle Name");
-        middleNameSlider = buildSlider(20);
+        middleNameSlider = buildSlider(getWeight("middleNameWeight"));
 
         JLabel lastNameLabel = new JLabel("Last Name");
-        lastNameSlider = buildSlider(50);
+        lastNameSlider = buildSlider(getWeight("lastNameWeight"));
 
         JLabel birthLabel = new JLabel("Birth Year");
-        birthSlider = buildSlider(30);
+        birthSlider = buildSlider(getWeight("birthWeight"));
 
         JLabel deathLabel = new JLabel("Death Year");
-        deathSlider = buildSlider(30);
+        deathSlider = buildSlider(getWeight("deathWeight"));
 
         JLabel motherLabel = new JLabel("Mother");
-        motherSlider = buildSlider(30);
+        motherSlider = buildSlider(getWeight("motherWeight"));
 
         JLabel fatherLabel = new JLabel("Father");
-        fatherSlider = buildSlider(30);
+        fatherSlider = buildSlider(getWeight("fatherWeight"));
 
         JLabel siblingLabel = new JLabel("Siblings");
-        siblingSlider = buildSlider(10);
+        siblingSlider = buildSlider(getWeight("siblingWeight"));
 
         JLabel childrenLabel = new JLabel("Children");
-        childrenSlider = buildSlider(10);
+        childrenSlider = buildSlider(getWeight("childrenWeight"));
 
         JButton saveButton = new JButton("Save as Defaults");
-        JButton factoryButton = new JButton("Restore Factory Settings");
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleSaveDefaults();
+            }
+        });
+
+        JButton factoryButton = new JButton("Restore Factory Defaults");
+        factoryButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleFactoryReset();
+            }
+        });
 
         Insets insetsLeftColumn = new Insets(5, 20, 15, 10);
         Insets insetsRightColumn = new Insets(5, 10, 15, 10);
@@ -103,6 +124,44 @@ public class AdvancedPanel extends JPanel {
 
         this.add(saveButton, buildConstraints(1, 5, insetsLeftColumn));
         this.add(factoryButton, buildConstraints(3, 5, insetsRightColumn));
+    }
+
+    protected void handleFactoryReset() {
+        Properties defaultProperties = Utility.getDefaultProperties();
+        Set<String> propertyNames = defaultProperties.stringPropertyNames();
+        for (String property : propertyNames) {
+            properties.setProperty(property, (String) defaultProperties.get(property));
+        }
+        Utility.saveProperties();
+        genderSlider.setValue(getWeight("genderWeight"));
+        firstNameSlider.setValue(getWeight("firstNameWeight"));
+        middleNameSlider.setValue(getWeight("middleNameWeight"));
+        lastNameSlider.setValue(getWeight("lastNameWeight"));
+        birthSlider.setValue(getWeight("birthWeight"));
+        deathSlider.setValue(getWeight("deathWeight"));
+        motherSlider.setValue(getWeight("motherWeight"));
+        fatherSlider.setValue(getWeight("fatherWeight"));
+        siblingSlider.setValue(getWeight("siblingWeight"));
+        childrenSlider.setValue(getWeight("childrenWeight"));
+    }
+
+    protected void handleSaveDefaults() {
+        properties.setProperty("genderWeight", Integer.toString(genderSlider.getValue()));
+        properties.setProperty("firstNameWeight", Integer.toString(firstNameSlider.getValue()));
+        properties.setProperty("middleNameWeight", Integer.toString(middleNameSlider.getValue()));
+        properties.setProperty("lastNameWeight", Integer.toString(lastNameSlider.getValue()));
+        properties.setProperty("birthWeight", Integer.toString(birthSlider.getValue()));
+        properties.setProperty("deathWeight", Integer.toString(deathSlider.getValue()));
+        properties.setProperty("motherWeight", Integer.toString(motherSlider.getValue()));
+        properties.setProperty("fatherWeight", Integer.toString(fatherSlider.getValue()));
+        properties.setProperty("siblingWeight", Integer.toString(siblingSlider.getValue()));
+        properties.setProperty("childrenWeight", Integer.toString(childrenSlider.getValue()));
+        Utility.saveProperties();
+    }
+
+    private int getWeight(String key) {
+        String stringValue = this.properties.getProperty(key);
+        return (Integer.parseInt(stringValue));
     }
 
     private JSlider buildSlider(int initialValue) {

@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import com.intuit.fuzzymatcher.component.MatchService;
 import com.intuit.fuzzymatcher.domain.Document;
@@ -29,8 +29,9 @@ public class DuplicatePanel extends JPanel implements SearchPanelListener {
     private SearchPanel searchPanel;
     private AdvancedPanel advancedPanel;
     private boolean advancedVisible = false;
-    private JScrollPane scrollPane;
+    JPanel resultPanel;
     private Properties properties;
+    private JLabel msgLabel = new JLabel("Loading...");
 
     public DuplicatePanel(Properties properties) {
         this.properties = properties;
@@ -67,65 +68,65 @@ public class DuplicatePanel extends JPanel implements SearchPanelListener {
                                     .setValue(individual.getGender())
                                     .setVariance("Gender")
                                     .setType(ElementType.TEXT)
-                                    .setWeight(getWeight("genderWeight"))
+                                    .setWeight(advancedPanel.getGender())
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getFirstName())
                                     .setVariance("FirstName")
                                     .setType(ElementType.NAME)
-                                    .setWeight(getWeight("firstNameWeight"))
+                                    .setWeight(advancedPanel.getFirstName())
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getMiddleName())
                                     .setVariance("MiddleName")
                                     .setType(ElementType.NAME)
-                                    .setWeight(getWeight("middleNameWeight"))
+                                    .setWeight(advancedPanel.getMiddleName())
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getLastName())
                                     .setVariance("LastName")
                                     .setType(ElementType.NAME)
-                                    .setWeight(getWeight("lastNameWeight"))
+                                    .setWeight(advancedPanel.getlastName())
                                     .createElement())
                             .addElement(new Element.Builder<Integer>()
                                     .setValue(individual.getBirthDateYear())
                                     .setVariance("Birth")
                                     .setType(ElementType.NUMBER)
-                                    .setWeight(getWeight("birthWeight"))
+                                    .setWeight(advancedPanel.getBirth())
                                     .setNeighborhoodRange(0.999)
                                     .createElement())
                             .addElement(new Element.Builder<Integer>()
                                     .setValue(individual.getDeathDateYear())
                                     .setVariance("Death")
                                     .setType(ElementType.NUMBER)
-                                    .setWeight(getWeight("deathWeight"))
+                                    .setWeight(advancedPanel.getDeath())
                                     .setNeighborhoodRange(0.999)
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getMotherFullName())
                                     .setVariance("MotherName")
                                     .setType(ElementType.NAME)
-                                    .setWeight(getWeight("motherWeight"))
+                                    .setWeight(advancedPanel.getMother())
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getFatherFullName())
                                     .setVariance("FatherName")
                                     .setType(ElementType.NAME)
-                                    .setWeight(getWeight("fatherWeight"))
+                                    .setWeight(advancedPanel.getFather())
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getSiblingsFirstNames())
                                     .setVariance("Siblings")
                                     .setType(ElementType.NAME)
-                                    .setWeight(getWeight("siblingWeight"))
+                                    .setWeight(advancedPanel.getSibling())
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getChildrenFirstNames())
                                     .setVariance("Children")
                                     .setType(ElementType.NAME)
-                                    .setWeight(getWeight("childrenWeight"))
+                                    .setWeight(advancedPanel.getChildren())
                                     .createElement())
-                            .setThreshold(getWeight("threshold"))
+                            .setThreshold(searchPanel.getThreshold())
                             .createDocument());
         });
 
@@ -159,26 +160,27 @@ public class DuplicatePanel extends JPanel implements SearchPanelListener {
         System.out.println("Duplicates: " + numDupsHolder.get());
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                JPanel resultPanel = new JPanel(new GridBagLayout());
-                for (int i = 0; i < panels.size(); i++) {
-                    resultPanel.add(panels.get(i), constraints.get(i));
+                resultPanel = new JPanel(new GridBagLayout());
+                if (panels.size() == 0) {
+                    msgLabel.setText("No Matches Found");
+                } else {
+                    for (int i = 0; i < panels.size(); i++) {
+                        resultPanel.add(panels.get(i), constraints.get(i));
+                    }
+                    if (resultPanel != null) {
+                        panel.remove(resultPanel);
+                    }
+                    GridBagConstraints c = new GridBagConstraints();
+                    c.gridx = 0;
+                    c.gridy = 2;
+                    c.weightx = 1;
+                    c.weighty = 1;
+                    panel.remove(msgLabel);
+                    panel.add(resultPanel, c);
                 }
-                if (scrollPane != null) {
-                    panel.remove(scrollPane);
-                }
-                scrollPane = new JScrollPane(resultPanel);
-                GridBagConstraints c = new GridBagConstraints();
-                c.gridx = 0;
-                c.gridy = 2;
-                panel.add(scrollPane, c);
                 panel.revalidate();
             }
         });
-    }
-
-    private double getWeight(String key) {
-        String stringValue = properties.getProperty(key);
-        return (Integer.parseInt(stringValue) / 100.0);
     }
 
     private List<Match<Document>> removeDuplicates(Map<String, List<Match<Document>>> result) {
@@ -262,6 +264,17 @@ public class DuplicatePanel extends JPanel implements SearchPanelListener {
 
     @Override
     public void handleSearch() {
+        if (resultPanel != null) {
+            panel.remove(resultPanel);
+        }
+        panel.remove(msgLabel);
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 2;
+        msgLabel.setText("Loading...");
+        this.add(msgLabel, c);
+        this.revalidate();
+
         Thread t = new Thread() {
             public void run() {
                 load(searchPanel.getSelectedFile());

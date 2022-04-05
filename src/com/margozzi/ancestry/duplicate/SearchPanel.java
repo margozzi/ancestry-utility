@@ -56,7 +56,6 @@ public class SearchPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 advancedButton.setText(advancedButton.getText().equals("Advanced") ? "Basic" : "Advanced");
-                advancedButton.setPreferredSize(browseButton.getSize());
                 if (listener != null) {
                     listener.handleAdvanced(e);
                 }
@@ -88,19 +87,21 @@ public class SearchPanel extends JPanel {
         c.gridx = 1;
         c.gridy = 0;
         c.insets = insets;
-
         this.add(fileLabel, c);
 
         c = new GridBagConstraints();
         c.gridx = 2;
         c.gridy = 0;
+        c.weightx = 1;
         c.insets = insets;
+        c.fill = GridBagConstraints.HORIZONTAL;
         this.add(fileTextField, c);
 
         c = new GridBagConstraints();
         c.gridx = 3;
         c.gridy = 0;
         c.insets = insets;
+        c.fill = GridBagConstraints.HORIZONTAL;
         this.add(browseButton, c);
 
         c = new GridBagConstraints();
@@ -112,13 +113,16 @@ public class SearchPanel extends JPanel {
         c = new GridBagConstraints();
         c.gridx = 2;
         c.gridy = 1;
+        c.weightx = 1;
         c.insets = bottomInsets;
+        c.fill = GridBagConstraints.HORIZONTAL;
         this.add(thresholdSlider, c);
 
         c = new GridBagConstraints();
         c.gridx = 3;
         c.gridy = 1;
         c.insets = bottomInsets;
+        c.fill = GridBagConstraints.HORIZONTAL;
         this.add(advancedButton, c);
     }
 
@@ -151,7 +155,13 @@ public class SearchPanel extends JPanel {
 
     public static void main(String[] args) {
         JFrame frame = new JFrame();
-        frame.getContentPane().add(new SearchPanel(null, Utility.getDefaultProperties()), BorderLayout.NORTH);
+        frame.getContentPane().add(new SearchPanel(null, Utility.getDefaultProperties()), BorderLayout.CENTER);
+        // JSlider thresholdSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 80);
+        // thresholdSlider.setMajorTickSpacing(50);
+        // thresholdSlider.setMinorTickSpacing(10);
+        // thresholdSlider.setPaintTicks(true);
+        // thresholdSlider.setPaintLabels(true);
+        // frame.getContentPane().add(thresholdSlider, BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
     }

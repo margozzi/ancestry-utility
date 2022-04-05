@@ -182,42 +182,42 @@ public class AdvancedPanel extends JPanel {
     }
 
     public double getFirstName() {
-        return firstNameSlider.getValue();
+        return firstNameSlider.getValue() / 100.0;
     }
 
     public double getMiddleName() {
-        return middleNameSlider.getValue();
+        return middleNameSlider.getValue() / 100.0;
     }
 
     public double getlastName() {
-        return lastNameSlider.getValue();
+        return lastNameSlider.getValue() / 100.0;
     }
 
     public double getGender() {
-        return genderSlider.getValue();
+        return genderSlider.getValue() / 100.0;
     }
 
     public double getBirth() {
-        return birthSlider.getValue();
+        return birthSlider.getValue() / 100.0;
     }
 
     public double getDeath() {
-        return deathSlider.getValue();
+        return deathSlider.getValue() / 100.0;
     }
 
     public double getMother() {
-        return motherSlider.getValue();
+        return motherSlider.getValue() / 100.0;
     }
 
     public double getFather() {
-        return fatherSlider.getValue();
+        return fatherSlider.getValue() / 100.0;
     }
 
     public double getSibling() {
-        return siblingSlider.getValue();
+        return siblingSlider.getValue() / 100.0;
     }
 
     public double getChildren() {
-        return childrenSlider.getValue();
+        return childrenSlider.getValue() / 100.0;
     }
 }

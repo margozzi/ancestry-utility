@@ -1,7 +1,8 @@
 package com.margozzi.ancestry;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -17,11 +18,13 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
 
 import com.margozzi.ancestry.duplicate.DuplicatePanel;
 
 public class Utility {
     private JFrame frame;
+    private JScrollPane scrollPane;
 
     private static Properties defaultProps;
     private static Properties properties;
@@ -34,6 +37,7 @@ public class Utility {
 
         // Create and set up the window.
         frame = new JFrame("Ancestry Utility");
+        frame.getContentPane().setLayout(new GridBagLayout());
         frame.setPreferredSize(new Dimension(width, height));
         frame.setMinimumSize(new Dimension(700, 550));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -61,7 +65,15 @@ public class Utility {
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().removeAll();
                 DuplicatePanel duplicatePanel = new DuplicatePanel(properties);
-                frame.getContentPane().add(duplicatePanel, BorderLayout.NORTH);
+                scrollPane = new JScrollPane(duplicatePanel);
+                GridBagConstraints c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = 0;
+                c.weightx = 1;
+                c.weighty = 1;
+                c.fill = GridBagConstraints.BOTH;
+                c.anchor = GridBagConstraints.PAGE_START;
+                frame.getContentPane().add(scrollPane, c);
                 frame.revalidate();
             }
         });

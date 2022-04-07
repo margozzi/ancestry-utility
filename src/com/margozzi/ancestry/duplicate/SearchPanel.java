@@ -26,7 +26,6 @@ public class SearchPanel extends JPanel {
     private JTextField fileTextField;
     JSlider thresholdSlider;
     JButton browseButton;
-    JButton advancedButton;
     JButton searchButton;
 
     public SearchPanel(SearchPanelListener listener, Properties properties) {
@@ -34,7 +33,7 @@ public class SearchPanel extends JPanel {
         this.properties = properties;
         JLabel fileLabel = new JLabel("File");
         fileLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        fileTextField = new JTextField("Click the browse button -->", 20);
+        fileTextField = new JTextField("Click the browse button -->", 25);
         fileTextField.setEditable(false);
         browseButton = new JButton("Browse...");
         browseButton.addActionListener(new ActionListener() {
@@ -44,23 +43,13 @@ public class SearchPanel extends JPanel {
             }
         });
 
-        JLabel thresholdLabel = new JLabel("Match Percent");
+        JLabel thresholdLabel = new JLabel("Match %");
         thresholdLabel.setHorizontalAlignment(SwingConstants.LEFT);
         thresholdSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 80);
         thresholdSlider.setMajorTickSpacing(50);
         thresholdSlider.setMinorTickSpacing(10);
         thresholdSlider.setPaintTicks(true);
         thresholdSlider.setPaintLabels(true);
-        advancedButton = new JButton("Advanced");
-        advancedButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                advancedButton.setText(advancedButton.getText().equals("Advanced") ? "Basic" : "Advanced");
-                if (listener != null) {
-                    listener.handleAdvanced(e);
-                }
-            }
-        });
 
         searchButton = new JButton("Search");
         searchButton.addActionListener(new ActionListener() {
@@ -79,19 +68,20 @@ public class SearchPanel extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
+        c.gridwidth = 4;
         c.insets = insets;
         c.anchor = GridBagConstraints.PAGE_START;
         this.add(searchButton, c);
 
         c = new GridBagConstraints();
         c.gridx = 1;
-        c.gridy = 0;
+        c.gridy = 1;
         c.insets = insets;
         this.add(fileLabel, c);
 
         c = new GridBagConstraints();
         c.gridx = 2;
-        c.gridy = 0;
+        c.gridy = 1;
         c.weightx = 1;
         c.insets = insets;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -99,31 +89,23 @@ public class SearchPanel extends JPanel {
 
         c = new GridBagConstraints();
         c.gridx = 3;
-        c.gridy = 0;
+        c.gridy = 1;
         c.insets = insets;
-        c.fill = GridBagConstraints.HORIZONTAL;
         this.add(browseButton, c);
 
         c = new GridBagConstraints();
         c.gridx = 1;
-        c.gridy = 1;
+        c.gridy = 2;
         c.insets = bottomInsets;
         this.add(thresholdLabel, c);
 
         c = new GridBagConstraints();
         c.gridx = 2;
-        c.gridy = 1;
+        c.gridy = 2;
         c.weightx = 1;
         c.insets = bottomInsets;
         c.fill = GridBagConstraints.HORIZONTAL;
         this.add(thresholdSlider, c);
-
-        c = new GridBagConstraints();
-        c.gridx = 3;
-        c.gridy = 1;
-        c.insets = bottomInsets;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        this.add(advancedButton, c);
     }
 
     private void handleBrowse() {
@@ -156,12 +138,6 @@ public class SearchPanel extends JPanel {
     public static void main(String[] args) {
         JFrame frame = new JFrame();
         frame.getContentPane().add(new SearchPanel(null, Utility.getDefaultProperties()), BorderLayout.CENTER);
-        // JSlider thresholdSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 80);
-        // thresholdSlider.setMajorTickSpacing(50);
-        // thresholdSlider.setMinorTickSpacing(10);
-        // thresholdSlider.setPaintTicks(true);
-        // thresholdSlider.setPaintLabels(true);
-        // frame.getContentPane().add(thresholdSlider, BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
     }

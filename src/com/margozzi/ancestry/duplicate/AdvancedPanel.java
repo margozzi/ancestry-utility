@@ -1,5 +1,6 @@
 package com.margozzi.ancestry.duplicate;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -87,43 +88,43 @@ public class AdvancedPanel extends JPanel {
             }
         });
 
-        Insets insetsLeftColumn = new Insets(5, 20, 15, 10);
-        Insets insetsRightColumn = new Insets(5, 10, 15, 10);
+        Insets insets = new Insets(5, 5, 5, 0);
 
-        GridBagConstraints c = buildConstraints(0, 0, insetsLeftColumn);
-        c.fill = GridBagConstraints.HORIZONTAL;
+        GridBagConstraints c = buildLabelConstraints(0, 0, insets);
+        c.anchor = GridBagConstraints.PAGE_START;
         this.add(firstNameLabel, c);
-        this.add(firstNameSlider, buildConstraints(1, 0, insetsRightColumn));
+        this.add(firstNameSlider, buildConstraints(1, 0, insets));
 
-        this.add(lastNameLabel, buildConstraints(2, 0, insetsLeftColumn));
-        this.add(lastNameSlider, buildConstraints(3, 0, insetsRightColumn));
+        this.add(middleNameLabel, buildLabelConstraints(0, 1, insets));
+        this.add(middleNameSlider, buildConstraints(1, 1, insets));
 
-        this.add(genderLabel, buildConstraints(0, 1, insetsLeftColumn));
-        this.add(genderSlider, buildConstraints(1, 1, insetsRightColumn));
+        this.add(lastNameLabel, buildLabelConstraints(0, 2, insets));
+        this.add(lastNameSlider, buildConstraints(1, 2, insets));
 
-        this.add(middleNameLabel, buildConstraints(2, 1, insetsLeftColumn));
-        this.add(middleNameSlider, buildConstraints(3, 1, insetsRightColumn));
+        this.add(genderLabel, buildLabelConstraints(0, 3, insets));
+        this.add(genderSlider, buildConstraints(1, 3, insets));
 
-        this.add(birthLabel, buildConstraints(0, 2, insetsLeftColumn));
-        this.add(birthSlider, buildConstraints(1, 2, insetsRightColumn));
+        this.add(birthLabel, buildLabelConstraints(0, 4, insets));
+        this.add(birthSlider, buildConstraints(1, 4, insets));
 
-        this.add(deathLabel, buildConstraints(2, 2, insetsLeftColumn));
-        this.add(deathSlider, buildConstraints(3, 2, insetsRightColumn));
+        this.add(deathLabel, buildLabelConstraints(0, 5, insets));
+        this.add(deathSlider, buildConstraints(1, 5, insets));
 
-        this.add(motherLabel, buildConstraints(0, 3, insetsLeftColumn));
-        this.add(motherSlider, buildConstraints(1, 3, insetsRightColumn));
+        this.add(motherLabel, buildLabelConstraints(0, 6, insets));
+        this.add(motherSlider, buildConstraints(1, 6, insets));
 
-        this.add(fatherLabel, buildConstraints(2, 3, insetsLeftColumn));
-        this.add(fatherSlider, buildConstraints(3, 3, insetsRightColumn));
+        this.add(fatherLabel, buildLabelConstraints(0, 7, insets));
+        this.add(fatherSlider, buildConstraints(1, 7, insets));
 
-        this.add(siblingLabel, buildConstraints(0, 4, insetsLeftColumn));
-        this.add(siblingSlider, buildConstraints(1, 4, insetsRightColumn));
+        this.add(siblingLabel, buildLabelConstraints(0, 8, insets));
+        this.add(siblingSlider, buildConstraints(1, 8, insets));
 
-        this.add(childrenLabel, buildConstraints(2, 4, insetsLeftColumn));
-        this.add(childrenSlider, buildConstraints(3, 4, insetsRightColumn));
+        this.add(childrenLabel, buildLabelConstraints(0, 9, insets));
+        this.add(childrenSlider, buildConstraints(1, 9, insets));
 
-        this.add(saveButton, buildConstraints(1, 5, insetsLeftColumn));
-        this.add(factoryButton, buildConstraints(3, 5, insetsRightColumn));
+        this.add(saveButton, buildConstraints(1, 10, insets));
+
+        this.add(factoryButton, buildConstraints(1, 11, insets));
     }
 
     protected void handleFactoryReset() {
@@ -170,13 +171,26 @@ public class AdvancedPanel extends JPanel {
         slider.setMinorTickSpacing(10);
         slider.setPaintTicks(true);
         slider.setPaintLabels(true);
+        slider.setMinimumSize(new Dimension(80, 58));
         return (slider);
+    }
+
+    private GridBagConstraints buildLabelConstraints(int x, int y, Insets insets) {
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = x;
+        c.gridy = y;
+        c.weightx = 0;
+        c.fill = GridBagConstraints.NONE;
+        c.insets = insets;
+        return (c);
     }
 
     private GridBagConstraints buildConstraints(int x, int y, Insets insets) {
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = x;
         c.gridy = y;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = insets;
         return (c);
     }

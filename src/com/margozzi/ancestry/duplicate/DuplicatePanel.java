@@ -1,8 +1,8 @@
 package com.margozzi.ancestry.duplicate;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 
 import com.intuit.fuzzymatcher.component.MatchService;
 import com.intuit.fuzzymatcher.domain.Document;
@@ -22,27 +23,40 @@ import com.intuit.fuzzymatcher.domain.Match;
 import com.margozzi.ancestry.file.Reader;
 import com.margozzi.ancestry.model.Individual;
 
-public class DuplicatePanel extends JPanel implements SearchPanelListener {
+public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
 
-    private final JPanel panel = this;
+    private JPanel panel = new JPanel(new GridBagLayout());
     private HashMap<String, Individual> individuals;
     private SearchPanel searchPanel;
     private AdvancedPanel advancedPanel;
-    private boolean advancedVisible = false;
-    JPanel resultPanel;
-    private Properties properties;
+    private JPanel resultPanel;
     private JLabel msgLabel = new JLabel("Loading...");
 
     public DuplicatePanel(Properties properties) {
-        this.properties = properties;
-        searchPanel = new SearchPanel(this, properties);
+
         advancedPanel = new AdvancedPanel(properties);
-        this.setLayout(new GridBagLayout());
+        advancedPanel.setMinimumSize(new Dimension(200, 760));
+        advancedPanel.setPreferredSize(new Dimension(300, 760));
+
+        panel = new JPanel(new GridBagLayout());
+        panel.setMinimumSize(new Dimension(550, 760));
+        panel.setPreferredSize(new Dimension(550, 760));
+
+        searchPanel = new SearchPanel(this, properties);
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.BOTH;
         c.anchor = GridBagConstraints.PAGE_START;
-        this.add(searchPanel, c);
+        panel.add(searchPanel, c);
+
+        this.setLeftComponent(advancedPanel);
+        this.setRightComponent(panel);
+        this.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+        this.setOneTouchExpandable(true);
+        // this.setDividerLocation(360);
     }
 
     private void load(File file) {
@@ -177,8 +191,9 @@ public class DuplicatePanel extends JPanel implements SearchPanelListener {
                     c.weighty = 1;
                     panel.remove(msgLabel);
                     panel.add(resultPanel, c);
+                    panel.revalidate();
                 }
-                panel.revalidate();
+                // splitPane.revalidate();
             }
         });
     }
@@ -272,8 +287,9 @@ public class DuplicatePanel extends JPanel implements SearchPanelListener {
         c.gridx = 0;
         c.gridy = 2;
         msgLabel.setText("Loading...");
-        this.add(msgLabel, c);
-        this.revalidate();
+        panel.add(msgLabel, c);
+        panel.revalidate();
+        // splitPane.revalidate();
 
         Thread t = new Thread() {
             public void run() {
@@ -282,20 +298,5 @@ public class DuplicatePanel extends JPanel implements SearchPanelListener {
         };
         t.start();
 
-    }
-
-    @Override
-    public void handleAdvanced(ActionEvent e) {
-        if (advancedVisible) {
-            this.remove(advancedPanel);
-            advancedVisible = false;
-        } else {
-            GridBagConstraints c = new GridBagConstraints();
-            c.gridx = 0;
-            c.gridy = 1;
-            this.add(advancedPanel, c);
-            advancedVisible = true;
-        }
-        this.revalidate();
     }
 }

@@ -135,6 +135,16 @@ public class SearchPanel extends JPanel {
         return thresholdSlider.getValue() / 100.0;
     }
 
+    public void setEnabled(boolean enabled) {
+        searchButton.setEnabled(enabled);
+        browseButton.setEnabled(enabled);
+        thresholdSlider.setEnabled(enabled);
+    }
+
+    public void setBrowseButtonEnabled(boolean enable) {
+
+    }
+
     public static void main(String[] args) {
         JFrame frame = new JFrame();
         frame.getContentPane().add(new SearchPanel(null, Utility.getDefaultProperties()), BorderLayout.CENTER);

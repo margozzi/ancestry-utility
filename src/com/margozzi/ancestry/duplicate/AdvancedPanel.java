@@ -26,6 +26,7 @@ public class AdvancedPanel extends JPanel {
     private JSlider lastNameSlider;
     private JSlider birthSlider;
     private JSlider deathSlider;
+    private JSlider spouseSlider;
     private JSlider motherSlider;
     private JSlider fatherSlider;
     private JSlider siblingSlider;
@@ -60,6 +61,9 @@ public class AdvancedPanel extends JPanel {
         JLabel deathLabel = new JLabel("Death Year");
         deathSlider = buildSlider(getWeight("deathWeight"));
 
+        JLabel spouseLabel = new JLabel("Spouse");
+        spouseSlider = buildSlider(getWeight("spouseWeight"));
+
         JLabel motherLabel = new JLabel("Mother");
         motherSlider = buildSlider(getWeight("motherWeight"));
 
@@ -88,10 +92,11 @@ public class AdvancedPanel extends JPanel {
             }
         });
 
-        Insets insets = new Insets(5, 5, 5, 0);
+        Insets insets = new Insets(5, 5, 5, 5);
 
         GridBagConstraints c = buildLabelConstraints(0, 0, insets);
         c.anchor = GridBagConstraints.PAGE_START;
+        c.fill = GridBagConstraints.HORIZONTAL;
         this.add(firstNameLabel, c);
         this.add(firstNameSlider, buildConstraints(1, 0, insets));
 
@@ -110,21 +115,24 @@ public class AdvancedPanel extends JPanel {
         this.add(deathLabel, buildLabelConstraints(0, 5, insets));
         this.add(deathSlider, buildConstraints(1, 5, insets));
 
-        this.add(motherLabel, buildLabelConstraints(0, 6, insets));
-        this.add(motherSlider, buildConstraints(1, 6, insets));
+        this.add(spouseLabel, buildLabelConstraints(0, 6, insets));
+        this.add(spouseSlider, buildConstraints(1, 6, insets));
 
-        this.add(fatherLabel, buildLabelConstraints(0, 7, insets));
-        this.add(fatherSlider, buildConstraints(1, 7, insets));
+        this.add(motherLabel, buildLabelConstraints(0, 7, insets));
+        this.add(motherSlider, buildConstraints(1, 7, insets));
 
-        this.add(siblingLabel, buildLabelConstraints(0, 8, insets));
-        this.add(siblingSlider, buildConstraints(1, 8, insets));
+        this.add(fatherLabel, buildLabelConstraints(0, 8, insets));
+        this.add(fatherSlider, buildConstraints(1, 8, insets));
 
-        this.add(childrenLabel, buildLabelConstraints(0, 9, insets));
-        this.add(childrenSlider, buildConstraints(1, 9, insets));
+        this.add(siblingLabel, buildLabelConstraints(0, 9, insets));
+        this.add(siblingSlider, buildConstraints(1, 9, insets));
 
-        this.add(saveButton, buildConstraints(1, 10, insets));
+        this.add(childrenLabel, buildLabelConstraints(0, 10, insets));
+        this.add(childrenSlider, buildConstraints(1, 10, insets));
 
-        this.add(factoryButton, buildConstraints(1, 11, insets));
+        this.add(saveButton, buildConstraints(1, 11, insets));
+
+        this.add(factoryButton, buildConstraints(1, 12, insets));
     }
 
     protected void handleFactoryReset() {
@@ -140,6 +148,7 @@ public class AdvancedPanel extends JPanel {
         lastNameSlider.setValue(getWeight("lastNameWeight"));
         birthSlider.setValue(getWeight("birthWeight"));
         deathSlider.setValue(getWeight("deathWeight"));
+        spouseSlider.setValue(getWeight("spouseWeight"));
         motherSlider.setValue(getWeight("motherWeight"));
         fatherSlider.setValue(getWeight("fatherWeight"));
         siblingSlider.setValue(getWeight("siblingWeight"));
@@ -153,6 +162,7 @@ public class AdvancedPanel extends JPanel {
         properties.setProperty("lastNameWeight", Integer.toString(lastNameSlider.getValue()));
         properties.setProperty("birthWeight", Integer.toString(birthSlider.getValue()));
         properties.setProperty("deathWeight", Integer.toString(deathSlider.getValue()));
+        properties.setProperty("spouseWeight", Integer.toString(spouseSlider.getValue()));
         properties.setProperty("motherWeight", Integer.toString(motherSlider.getValue()));
         properties.setProperty("fatherWeight", Integer.toString(fatherSlider.getValue()));
         properties.setProperty("siblingWeight", Integer.toString(siblingSlider.getValue()));
@@ -217,6 +227,10 @@ public class AdvancedPanel extends JPanel {
 
     public double getDeath() {
         return deathSlider.getValue() / 100.0;
+    }
+
+    public double getSpouse() {
+        return spouseSlider.getValue() / 100.0;
     }
 
     public double getMother() {

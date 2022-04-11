@@ -3,6 +3,7 @@ package com.margozzi.ancestry;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -23,7 +24,7 @@ import javax.swing.JScrollPane;
 import com.margozzi.ancestry.duplicate.DuplicatePanel;
 
 public class Utility {
-    private JFrame frame;
+    private static JFrame frame;
     private JScrollPane scrollPane;
 
     private static Properties defaultProps;
@@ -35,11 +36,14 @@ public class Utility {
         int width = Integer.parseInt(properties.getProperty("frameWidth"));
         int height = Integer.parseInt(properties.getProperty("frameHeight"));
 
+        int xPosition = Integer.parseInt(properties.getProperty("xPosition"));
+        int yPosition = Integer.parseInt(properties.getProperty("yPosition"));
+
         // Create and set up the window.
         frame = new JFrame("Ancestry Utility");
         frame.getContentPane().setLayout(new GridBagLayout());
         frame.setPreferredSize(new Dimension(width, height));
-        frame.setMinimumSize(new Dimension(700, 550));
+        frame.setLocation(xPosition, yPosition);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(buildMenu());
         frame.addWindowListener(new WindowAdapter() {
@@ -137,6 +141,11 @@ public class Utility {
         if (userPropertiesFile.exists()) {
             userPropertiesFile.delete();
         }
+        properties.setProperty("frameWidth", Integer.toString(frame.getWidth()));
+        properties.setProperty("frameHeight", Integer.toString(frame.getHeight()));
+        Point location = frame.getLocation();
+        properties.setProperty("xPosition", Integer.toString((int) location.getX()));
+        properties.setProperty("yPosition", Integer.toString((int) location.getY()));
         try {
             FileOutputStream fos = new FileOutputStream(userPropertiesFile);
             properties.store(fos, "System generated, do not edit");

@@ -1,5 +1,6 @@
 package com.margozzi.ancestry.duplicate;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -13,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import com.intuit.fuzzymatcher.component.MatchService;
@@ -25,7 +27,8 @@ import com.margozzi.ancestry.model.Individual;
 
 public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
 
-    private JPanel panel = new JPanel(new GridBagLayout());
+    private JPanel rightPanel = new JPanel(new GridBagLayout());
+    private JScrollPane resultScrollPane;
     private HashMap<String, Individual> individuals;
     private SearchPanel searchPanel;
     private AdvancedPanel advancedPanel;
@@ -35,25 +38,27 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
     public DuplicatePanel(Properties properties) {
 
         advancedPanel = new AdvancedPanel(properties);
-        advancedPanel.setMinimumSize(new Dimension(200, 760));
-        advancedPanel.setPreferredSize(new Dimension(300, 760));
+        advancedPanel.setMinimumSize(new Dimension(200, 600));
+        advancedPanel.setPreferredSize(new Dimension(300, 600));
+        advancedPanel.setBackground(Color.red);
 
-        panel = new JPanel(new GridBagLayout());
-        panel.setMinimumSize(new Dimension(550, 760));
-        panel.setPreferredSize(new Dimension(550, 760));
+        rightPanel = new JPanel(new GridBagLayout());
+        rightPanel.setMinimumSize(new Dimension(550, 600));
+        rightPanel.setPreferredSize(new Dimension(550, 600));
 
         searchPanel = new SearchPanel(this, properties);
+
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
         c.weightx = 1;
-        c.weighty = 1;
-        c.fill = GridBagConstraints.BOTH;
+        c.weighty = 0.01;
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.PAGE_START;
-        panel.add(searchPanel, c);
+        rightPanel.add(searchPanel, c);
 
         this.setLeftComponent(advancedPanel);
-        this.setRightComponent(panel);
+        this.setRightComponent(rightPanel);
         this.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
         this.setOneTouchExpandable(true);
         // this.setDividerLocation(360);
@@ -71,6 +76,7 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
         List<Document> documentList = new ArrayList<Document>();
         // Augment Individuals with extra information.
         individuals.forEach((id, individual) -> {
+            setSpouseFullName(individual);
             setMothersFullName(individual);
             setFathersFullName(individual);
             setSiblingsFirstNames(individual);
@@ -115,6 +121,12 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
                                     .setType(ElementType.NUMBER)
                                     .setWeight(advancedPanel.getDeath())
                                     .setNeighborhoodRange(0.999)
+                                    .createElement())
+                            .addElement(new Element.Builder<String>()
+                                    .setValue(individual.getSpouseFullName())
+                                    .setVariance("SpouseName")
+                                    .setType(ElementType.NAME)
+                                    .setWeight(advancedPanel.getSpouse())
                                     .createElement())
                             .addElement(new Element.Builder<String>()
                                     .setValue(individual.getMotherFullName())
@@ -174,26 +186,28 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
         System.out.println("Duplicates: " + numDupsHolder.get());
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                resultPanel = new JPanel(new GridBagLayout());
+
                 if (panels.size() == 0) {
                     msgLabel.setText("No Matches Found");
                 } else {
+                    rightPanel.remove(msgLabel);
+
+                    resultPanel = new JPanel(new GridBagLayout());
                     for (int i = 0; i < panels.size(); i++) {
                         resultPanel.add(panels.get(i), constraints.get(i));
                     }
-                    if (resultPanel != null) {
-                        panel.remove(resultPanel);
-                    }
+                    resultScrollPane = new JScrollPane(resultPanel);
+
                     GridBagConstraints c = new GridBagConstraints();
                     c.gridx = 0;
-                    c.gridy = 2;
+                    c.gridy = 1;
                     c.weightx = 1;
                     c.weighty = 1;
-                    panel.remove(msgLabel);
-                    panel.add(resultPanel, c);
-                    panel.revalidate();
+                    c.fill = GridBagConstraints.BOTH;
+                    rightPanel.add(resultScrollPane, c);
                 }
-                // splitPane.revalidate();
+                searchPanel.setEnabled(true);
+                rightPanel.revalidate();
             }
         });
     }
@@ -217,6 +231,27 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
             }
         }
         return data;
+    }
+
+    private void setSpouseFullName(Individual individual) {
+        String spouseIds = individual.getSpouseId(); // Could have multiple
+        if (spouseIds != null && spouseIds.length() > 0) {
+            String[] ids = spouseIds.split(",");
+            String spousesFullNames = null;
+            for (String id : ids) {
+                Individual spouse = this.individuals.get(id);
+                if (spouse != null && spouse.getFullName() != null) {
+                    spousesFullNames += spouse.getFullName() + " ";
+                }
+            }
+            if (spousesFullNames != null) {
+                individual.setSpouseFullName(spousesFullNames);
+            } else {
+                individual.setSpouseFullName("");
+            }
+        } else {
+            individual.setSpouseFullName("");
+        }
     }
 
     private void setMothersFullName(Individual individual) {
@@ -279,17 +314,20 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
 
     @Override
     public void handleSearch() {
-        if (resultPanel != null) {
-            panel.remove(resultPanel);
+        searchPanel.setEnabled(false);
+        if (resultScrollPane != null) {
+            rightPanel.remove(resultScrollPane);
         }
-        panel.remove(msgLabel);
+        rightPanel.remove(msgLabel);
+        msgLabel.setText("Loading...");
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 2;
-        msgLabel.setText("Loading...");
-        panel.add(msgLabel, c);
-        panel.revalidate();
-        // splitPane.revalidate();
+        c.gridy = 1;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.BOTH;
+        rightPanel.add(msgLabel, c);
+        rightPanel.revalidate();
 
         Thread t = new Thread() {
             public void run() {

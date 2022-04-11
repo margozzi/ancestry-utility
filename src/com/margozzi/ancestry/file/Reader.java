@@ -15,7 +15,7 @@ public class Reader {
     private int countMale = 0;
     private int countFemale = 0;
     private int idIdx, genderIdx, firstNameIdx, middleNameIdx, lastNameIdx, birthDateIdx, deathDateIdx;
-    private int fatherIdx, motherIdx, siblingIdx, childrenIdx;
+    private int spouseIdx, fatherIdx, motherIdx, siblingIdx, childrenIdx;
 
     public Reader(File file) {
         this.file = file;
@@ -35,6 +35,7 @@ public class Reader {
                     lastNameIdx = list.indexOf("Name.Last");
                     birthDateIdx = list.indexOf("Birth.Date");
                     deathDateIdx = list.indexOf("Death.Date");
+                    spouseIdx = list.indexOf("Mates");
                     fatherIdx = list.indexOf("Fathers");
                     motherIdx = list.indexOf("Mothers");
                     siblingIdx = list.indexOf("Siblings");
@@ -83,6 +84,8 @@ public class Reader {
                 String birthDate = numTokens > birthDateIdx ? tokens[birthDateIdx] : null;
                 String deathDate = numTokens > deathDateIdx ? tokens[deathDateIdx] : null;
 
+                String spouse = numTokens > spouseIdx ? tokens[spouseIdx] : null;
+
                 String father = numTokens > fatherIdx ? tokens[fatherIdx] : null;
                 String mother = numTokens > motherIdx ? tokens[motherIdx] : null;
 
@@ -90,7 +93,7 @@ public class Reader {
                 String children = numTokens > childrenIdx ? tokens[childrenIdx] : null;
 
                 Individual individual = Individual.createNewInstance(id, gender, firstName,
-                        middleName, lastName, birthDate, deathDate, mother, father, siblings, children);
+                        middleName, lastName, birthDate, deathDate, spouse, mother, father, siblings, children);
                 individuals.put(individual.getId(), individual);
             }
             scanner.close();

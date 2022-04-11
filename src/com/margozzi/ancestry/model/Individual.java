@@ -20,11 +20,13 @@ public final class Individual {
     private final Integer deathDateDay;
     private final Integer deathDateMonth;
     private final Integer deathDateYear;
+    private final String spouseId;
     private final String motherId;
     private final String fatherId;
     private final String siblingIds;
     private final String childrenIds;
 
+    private String spouseFullName;
     private String motherFullName;
     private String fatherFullName;
     private String siblingFirstNames;
@@ -35,7 +37,7 @@ public final class Individual {
     // Default private constructor will ensure no unplanned construction of class
     private Individual(String id, String gender, String firstName, String middleName,
             String lastName, Integer birthDateDay, Integer birthDateMonth, Integer birthDateYear, Integer deathDateDay,
-            Integer deathDateMonth, Integer deathDateYear,
+            Integer deathDateMonth, Integer deathDateYear, String spouseId,
             String motherId, String fatherId, String siblingIds, String childrenIds) {
         this.id = id;
         this.gender = gender;
@@ -48,6 +50,7 @@ public final class Individual {
         this.deathDateDay = deathDateDay;
         this.deathDateMonth = deathDateMonth;
         this.deathDateYear = deathDateYear;
+        this.spouseId = spouseId;
         this.motherId = motherId;
         this.fatherId = fatherId;
         this.siblingIds = siblingIds;
@@ -56,14 +59,14 @@ public final class Individual {
 
     // Factory method to store object creation logic in single place
     public static Individual createNewInstance(String id, String gender, String firstName,
-            String middleName, String lastName, String birthDate, String deathDate, String motherId,
-            String fatherId, String siblingIds, String childrenIds) {
+            String middleName, String lastName, String birthDate, String deathDate, String spouseId,
+            String motherId, String fatherId, String siblingIds, String childrenIds) {
 
         Integer[] numericBirthDate = parseDateString(birthDate);
         Integer[] numericDeathDate = parseDateString(deathDate);
         return (new Individual(id, gender, firstName, middleName, lastName, numericBirthDate[0], numericBirthDate[1],
                 numericBirthDate[2], numericDeathDate[0], numericDeathDate[1],
-                numericDeathDate[2], motherId, fatherId, siblingIds, childrenIds));
+                numericDeathDate[2], spouseId, motherId, fatherId, siblingIds, childrenIds));
     }
 
     private static Integer[] parseDateString(String birthDate) {
@@ -152,8 +155,20 @@ public final class Individual {
         return deathDateYear;
     }
 
+    public String getSpouseId() {
+        return spouseId;
+    }
+
     public String getMotherId() {
         return motherId;
+    }
+
+    public String getSpouseFullName() {
+        return spouseFullName;
+    }
+
+    public void setSpouseFullName(String name) {
+        spouseFullName = name;
     }
 
     public String getMotherFullName() {
@@ -235,9 +250,9 @@ public final class Individual {
         if (deathDateYear != null)
             individual += deathDateYear;
 
+        individual += "\nSpouse:  " + spouseId;
         individual += "\nMother:  " + motherId;
         individual += "\nFather:  " + fatherId;
-
         individual += "\nSiblings: " + siblingFirstNames;
         individual += "\nChildren: " + childrenFirstNames;
 

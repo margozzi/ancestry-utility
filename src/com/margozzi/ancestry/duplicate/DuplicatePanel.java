@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.imageio.plugins.jpeg.JPEGHuffmanTable;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -27,20 +28,19 @@ import com.margozzi.ancestry.model.Individual;
 
 public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
 
-    private JPanel rightPanel = new JPanel(new GridBagLayout());
+    private JPanel rightPanel;
     private JScrollPane resultScrollPane;
+    private JScrollPane leftScrollPane;
     private HashMap<String, Individual> individuals;
     private SearchPanel searchPanel;
     private AdvancedPanel advancedPanel;
     private JPanel resultPanel;
-    private JLabel msgLabel = new JLabel("Loading...");
+    private JLabel msgLabel = new JLabel("Searching...");
 
     public DuplicatePanel(Properties properties) {
 
         advancedPanel = new AdvancedPanel(properties);
-        advancedPanel.setMinimumSize(new Dimension(200, 600));
-        advancedPanel.setPreferredSize(new Dimension(300, 600));
-        advancedPanel.setBackground(Color.red);
+        leftScrollPane = new JScrollPane(advancedPanel);
 
         rightPanel = new JPanel(new GridBagLayout());
         rightPanel.setMinimumSize(new Dimension(550, 600));
@@ -57,7 +57,7 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
         c.anchor = GridBagConstraints.PAGE_START;
         rightPanel.add(searchPanel, c);
 
-        this.setLeftComponent(advancedPanel);
+        this.setLeftComponent(leftScrollPane);
         this.setRightComponent(rightPanel);
         this.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
         this.setOneTouchExpandable(true);
@@ -319,7 +319,7 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
             rightPanel.remove(resultScrollPane);
         }
         rightPanel.remove(msgLabel);
-        msgLabel.setText("Loading...");
+        msgLabel.setText("Searching...");
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 1;

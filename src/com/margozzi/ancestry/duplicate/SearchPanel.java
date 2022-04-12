@@ -31,10 +31,30 @@ public class SearchPanel extends JPanel {
     public SearchPanel(SearchPanelListener listener, Properties properties) {
         super(new GridBagLayout());
         this.properties = properties;
+
+        searchButton = new JButton("Search");
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (listener != null) {
+                    listener.handleSearch();
+                }
+            }
+        });
+
         JLabel fileLabel = new JLabel("File");
         fileLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        fileTextField = new JTextField("Click the browse button -->", 25);
+
+        String dir = this.properties.getProperty("lastFileDirectory");
+        if (dir.equals("user.home") == false) {
+            selectedFile = new File(dir);
+            fileTextField = new JTextField(selectedFile.getName());
+        } else {
+            fileTextField = new JTextField("Click the browse button -->");
+            searchButton.setEnabled(false);
+        }
         fileTextField.setEditable(false);
+
         browseButton = new JButton("Browse...");
         browseButton.addActionListener(new ActionListener() {
             @Override
@@ -50,17 +70,6 @@ public class SearchPanel extends JPanel {
         thresholdSlider.setMinorTickSpacing(10);
         thresholdSlider.setPaintTicks(true);
         thresholdSlider.setPaintLabels(true);
-
-        searchButton = new JButton("Search");
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (listener != null) {
-                    listener.handleSearch();
-                }
-            }
-        });
-        searchButton.setEnabled(false);
 
         Insets insets = new Insets(5, 10, 5, 10);
         Insets bottomInsets = new Insets(5, 10, 15, 10);

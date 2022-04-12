@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 
 import com.margozzi.ancestry.Utility;
@@ -34,7 +35,9 @@ public class AdvancedPanel extends JPanel {
 
     public static void main(String[] args) {
         JFrame frame = new JFrame();
-        frame.getContentPane().add(new AdvancedPanel(Utility.getDefaultProperties()));
+        AdvancedPanel advancePanel = new AdvancedPanel(Utility.getDefaultProperties());
+        JScrollPane scroller = new JScrollPane(advancePanel);
+        frame.getContentPane().add(scroller);
         frame.pack();
         frame.setVisible(true);
     }
@@ -42,6 +45,8 @@ public class AdvancedPanel extends JPanel {
     public AdvancedPanel(Properties properties) {
         super(new GridBagLayout());
         this.properties = properties;
+
+        JLabel titleLabel = new JLabel("Relative Importance");
 
         JLabel genderLabel = new JLabel("Gender");
         genderSlider = buildSlider(getWeight("genderWeight"));
@@ -94,45 +99,50 @@ public class AdvancedPanel extends JPanel {
 
         Insets insets = new Insets(5, 5, 5, 5);
 
-        GridBagConstraints c = buildLabelConstraints(0, 0, insets);
+        GridBagConstraints c = buildLabelConstraints(1, 0, insets);
+        c.anchor = GridBagConstraints.PAGE_START;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        this.add(titleLabel, c);
+
+        c = buildLabelConstraints(0, 1, insets);
         c.anchor = GridBagConstraints.PAGE_START;
         c.fill = GridBagConstraints.HORIZONTAL;
         this.add(firstNameLabel, c);
-        this.add(firstNameSlider, buildConstraints(1, 0, insets));
+        this.add(firstNameSlider, buildConstraints(1, 1, insets));
 
-        this.add(middleNameLabel, buildLabelConstraints(0, 1, insets));
-        this.add(middleNameSlider, buildConstraints(1, 1, insets));
+        this.add(middleNameLabel, buildLabelConstraints(0, 2, insets));
+        this.add(middleNameSlider, buildConstraints(1, 2, insets));
 
-        this.add(lastNameLabel, buildLabelConstraints(0, 2, insets));
-        this.add(lastNameSlider, buildConstraints(1, 2, insets));
+        this.add(lastNameLabel, buildLabelConstraints(0, 3, insets));
+        this.add(lastNameSlider, buildConstraints(1, 3, insets));
 
-        this.add(genderLabel, buildLabelConstraints(0, 3, insets));
-        this.add(genderSlider, buildConstraints(1, 3, insets));
+        this.add(genderLabel, buildLabelConstraints(0, 4, insets));
+        this.add(genderSlider, buildConstraints(1, 4, insets));
 
-        this.add(birthLabel, buildLabelConstraints(0, 4, insets));
-        this.add(birthSlider, buildConstraints(1, 4, insets));
+        this.add(birthLabel, buildLabelConstraints(0, 5, insets));
+        this.add(birthSlider, buildConstraints(1, 5, insets));
 
-        this.add(deathLabel, buildLabelConstraints(0, 5, insets));
-        this.add(deathSlider, buildConstraints(1, 5, insets));
+        this.add(deathLabel, buildLabelConstraints(0, 6, insets));
+        this.add(deathSlider, buildConstraints(1, 6, insets));
 
-        this.add(spouseLabel, buildLabelConstraints(0, 6, insets));
-        this.add(spouseSlider, buildConstraints(1, 6, insets));
+        this.add(spouseLabel, buildLabelConstraints(0, 7, insets));
+        this.add(spouseSlider, buildConstraints(1, 7, insets));
 
-        this.add(motherLabel, buildLabelConstraints(0, 7, insets));
-        this.add(motherSlider, buildConstraints(1, 7, insets));
+        this.add(motherLabel, buildLabelConstraints(0, 8, insets));
+        this.add(motherSlider, buildConstraints(1, 8, insets));
 
-        this.add(fatherLabel, buildLabelConstraints(0, 8, insets));
-        this.add(fatherSlider, buildConstraints(1, 8, insets));
+        this.add(fatherLabel, buildLabelConstraints(0, 9, insets));
+        this.add(fatherSlider, buildConstraints(1, 9, insets));
 
-        this.add(siblingLabel, buildLabelConstraints(0, 9, insets));
-        this.add(siblingSlider, buildConstraints(1, 9, insets));
+        this.add(siblingLabel, buildLabelConstraints(0, 10, insets));
+        this.add(siblingSlider, buildConstraints(1, 10, insets));
 
-        this.add(childrenLabel, buildLabelConstraints(0, 10, insets));
-        this.add(childrenSlider, buildConstraints(1, 10, insets));
+        this.add(childrenLabel, buildLabelConstraints(0, 11, insets));
+        this.add(childrenSlider, buildConstraints(1, 11, insets));
 
-        this.add(saveButton, buildConstraints(1, 11, insets));
+        this.add(saveButton, buildConstraints(1, 12, insets));
 
-        this.add(factoryButton, buildConstraints(1, 12, insets));
+        this.add(factoryButton, buildConstraints(1, 13, insets));
     }
 
     protected void handleFactoryReset() {
@@ -181,7 +191,7 @@ public class AdvancedPanel extends JPanel {
         slider.setMinorTickSpacing(10);
         slider.setPaintTicks(true);
         slider.setPaintLabels(true);
-        slider.setMinimumSize(new Dimension(80, 58));
+        slider.setMinimumSize(new Dimension(250, 55));
         return (slider);
     }
 

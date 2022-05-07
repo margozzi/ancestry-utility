@@ -21,10 +21,11 @@ import com.intuit.fuzzymatcher.domain.Document;
 import com.intuit.fuzzymatcher.domain.Element;
 import com.intuit.fuzzymatcher.domain.ElementType;
 import com.intuit.fuzzymatcher.domain.Match;
+import com.margozzi.ancestry.file.IgnoreFile;
 import com.margozzi.ancestry.file.Reader;
 import com.margozzi.ancestry.model.Individual;
 
-public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
+public class DuplicatePanel extends JSplitPane implements SearchPanelListener, IgnoreListener {
 
     private JPanel rightPanel;
     private JScrollPane resultScrollPane;
@@ -34,6 +35,7 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
     private AdvancedPanel advancedPanel;
     private JPanel resultPanel;
     private JLabel msgLabel = new JLabel("Searching...");
+    private IgnoreFile ignoreFile;
 
     public DuplicatePanel(Properties properties) {
 
@@ -70,6 +72,13 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
         System.out.println("Individuals: " + individuals.size());
         System.out.println("Males: " + reader.getCountMale());
         System.out.println("Females: " + reader.getCountFemale());
+
+        String path = file.getParent() + File.separator;
+        String baseFileName = file.getName().split("\\.")[0];
+        path += baseFileName;
+        path += ".ignore";
+        ignoreFile = new IgnoreFile(new File(path));
+        ignoreFile.read();
 
         List<Document> documentList = new ArrayList<Document>();
         // Augment Individuals with extra information.
@@ -162,17 +171,23 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
         ArrayList<IndividualPanel> panels = new ArrayList<IndividualPanel>();
         ArrayList<GridBagConstraints> constraints = new ArrayList<GridBagConstraints>();
         List<Match<Document>> noDuplicates = removeDuplicates(result);
+        noDuplicates = removeIgnores(noDuplicates);
+
         noDuplicates.forEach(match -> {
             GridBagConstraints c = new GridBagConstraints();
             c.gridx = 0;
             int y = yHolder.getAndIncrement();
             c.gridy = y;
-            panels.add(new IndividualPanel(individuals.get(match.getData().getKey())));
+            IndividualPanel panel = new IndividualPanel(individuals.get(match.getData().getKey()));
+            panel.setIgnoreListener(this);
+            panels.add(panel);
             constraints.add(c);
             c = new GridBagConstraints();
             c.gridx = 1;
             c.gridy = y++;
-            panels.add(new IndividualPanel(individuals.get(match.getMatchedWith().getKey())));
+            panel = new IndividualPanel(individuals.get(match.getMatchedWith().getKey()));
+            panel.setIgnoreListener(this);
+            panels.add(panel);
             constraints.add(c);
             numDupsHolder.incrementAndGet();
 
@@ -226,6 +241,18 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
                 if (leftKey.equals(rightKeyMatch) && rightKey.equals(leftKeyMatch)) {
                     data.remove(j);
                 }
+            }
+        }
+        return data;
+    }
+
+    private List<Match<Document>> removeIgnores(List<Match<Document>> data) {
+
+        for (int i = data.size() - 1; i >= 0; i--) {
+            String leftKey = data.get(i).getData().getKey();
+            String rightKey = data.get(i).getMatchedWith().getKey();
+            if (ignoreFile.containsId(leftKey) || ignoreFile.containsId(rightKey)) {
+                data.remove(i);
             }
         }
         return data;
@@ -334,5 +361,10 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener {
         };
         t.start();
 
+    }
+
+    @Override
+    public void handleIgnore(String id) {
+        ignoreFile.addId(id);
     }
 }

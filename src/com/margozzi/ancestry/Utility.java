@@ -20,6 +20,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
+import javax.swing.UIManager;
 
 import com.margozzi.ancestry.duplicate.DuplicatePanel;
 
@@ -155,6 +156,11 @@ public class Utility {
     }
 
     public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            System.out.println("Unable to set the look anf feel");
+        }
         Utility utility = new Utility();
         utility.loadApplicationProperties();
         javax.swing.SwingUtilities.invokeLater(new Runnable() {

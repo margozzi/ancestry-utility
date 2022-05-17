@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch Dialog",
+            "request": "launch",
+            "mainClass": "com.margozzi.ancestry.duplicate.ignore.Dialog",
+            "projectName": "ancestry-utility_38c25759"
+        },
+        {
+            "type": "java",
             "name": "Launch AdvancedPanel",
             "request": "launch",
             "mainClass": "com.margozzi.ancestry.duplicate.AdvancedPanel",

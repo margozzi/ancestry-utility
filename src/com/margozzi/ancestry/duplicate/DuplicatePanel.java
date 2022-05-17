@@ -25,7 +25,7 @@ import com.margozzi.ancestry.file.IgnoreFile;
 import com.margozzi.ancestry.file.Reader;
 import com.margozzi.ancestry.model.Individual;
 
-public class DuplicatePanel extends JSplitPane implements SearchPanelListener, IgnoreListener {
+public class DuplicatePanel extends JSplitPane implements SearchPanelListener, IgnoreProvider {
 
     private JPanel rightPanel;
     private JScrollPane resultScrollPane;
@@ -47,6 +47,9 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener, I
         rightPanel.setPreferredSize(new Dimension(550, 600));
 
         searchPanel = new SearchPanel(this, properties);
+        searchPanel.setIgnoreProvider(this);
+        onFileChange(searchPanel.getSelectedFile());
+        searchPanel.updateIgnoreButton();
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -61,24 +64,9 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener, I
         this.setRightComponent(rightPanel);
         this.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
         this.setOneTouchExpandable(true);
-        // this.setDividerLocation(360);
     }
 
     private void load(File file) {
-        Reader reader = new Reader(file);
-        reader.read();
-
-        individuals = reader.getIndividuals();
-        System.out.println("Individuals: " + individuals.size());
-        System.out.println("Males: " + reader.getCountMale());
-        System.out.println("Females: " + reader.getCountFemale());
-
-        String path = file.getParent() + File.separator;
-        String baseFileName = file.getName().split("\\.")[0];
-        path += baseFileName;
-        path += ".ignore";
-        ignoreFile = new IgnoreFile(new File(path));
-        ignoreFile.read();
 
         List<Document> documentList = new ArrayList<Document>();
         // Augment Individuals with extra information.
@@ -179,14 +167,14 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener, I
             int y = yHolder.getAndIncrement();
             c.gridy = y;
             IndividualPanel panel = new IndividualPanel(individuals.get(match.getData().getKey()));
-            panel.setIgnoreListener(this);
+            panel.setIgnoreProvider(this);
             panels.add(panel);
             constraints.add(c);
             c = new GridBagConstraints();
             c.gridx = 1;
             c.gridy = y++;
             panel = new IndividualPanel(individuals.get(match.getMatchedWith().getKey()));
-            panel.setIgnoreListener(this);
+            panel.setIgnoreProvider(this);
             panels.add(panel);
             constraints.add(c);
             numDupsHolder.incrementAndGet();
@@ -219,7 +207,6 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener, I
                     c.fill = GridBagConstraints.BOTH;
                     rightPanel.add(resultScrollPane, c);
                 }
-                searchPanel.setEnabled(true);
                 rightPanel.revalidate();
             }
         });
@@ -338,8 +325,7 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener, I
     }
 
     @Override
-    public void handleSearch() {
-        searchPanel.setEnabled(false);
+    public void onSearch() {
         if (resultScrollPane != null) {
             rightPanel.remove(resultScrollPane);
         }
@@ -364,7 +350,64 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener, I
     }
 
     @Override
-    public void handleIgnore(String id) {
-        ignoreFile.addId(id);
+    public void onFileChange(File file) {
+
+        Reader reader = new Reader(file);
+        reader.read();
+        individuals = reader.getIndividuals();
+        System.out.println("Individuals: " + individuals.size());
+        System.out.println("Males: " + reader.getCountMale());
+        System.out.println("Females: " + reader.getCountFemale());
+
+        String path = file.getParent() + File.separator;
+        String baseFileName = file.getName().split("\\.")[0];
+        path += baseFileName;
+        path += ".ignore";
+        ignoreFile = new IgnoreFile(new File(path));
+        ignoreFile.read();
+
+        if (resultScrollPane != null) {
+            rightPanel.remove(resultScrollPane);
+            // Not working
+            rightPanel.revalidate();
+        }
     }
+
+    @Override
+    public HashMap<String, Individual> getInidividuals() {
+        return individuals;
+    }
+
+    @Override
+    public ArrayList<String> getIgnoreIds() {
+        if (ignoreFile != null) {
+            return ignoreFile.getAll();
+        } else {
+            return null;
+        }
+
+    }
+
+    @Override
+    public void addToIgnore(String id) {
+        ignoreFile.addId(id);
+        updateIgnoreButton();
+    }
+
+    @Override
+    public void removeFromIgnore(String id) {
+        ignoreFile.removeId(id);
+        updateIgnoreButton();
+    }
+
+    @Override
+    public void removeAllFromIgnore() {
+        ignoreFile.removeAll();
+        updateIgnoreButton();
+    }
+
+    private void updateIgnoreButton() {
+        searchPanel.updateIgnoreButton();
+    }
+
 }

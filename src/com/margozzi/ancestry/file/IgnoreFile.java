@@ -4,19 +4,20 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
 public class IgnoreFile {
     private File file;
-    private HashMap<String, String> ids = new HashMap<String, String>();
+    private HashMap<String, String> ids;
 
     public IgnoreFile(File file) {
         this.file = file;
     }
 
     public void read() {
+        ids = new HashMap<String, String>();
         try {
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
@@ -46,9 +47,7 @@ public class IgnoreFile {
     }
 
     public void write() {
-        if (file.exists()) {
-            file.delete();
-        }
+        file.delete();
         try {
             file.createNewFile();
         } catch (IOException ioe) {
@@ -64,7 +63,12 @@ public class IgnoreFile {
         }
     }
 
-    public Collection<String> getAll() {
-        return ids.values();
+    public ArrayList<String> getAll() {
+        return new ArrayList<String>(ids.values());
+    }
+
+    public void removeAll() {
+        ids.clear();
+        write();
     }
 }

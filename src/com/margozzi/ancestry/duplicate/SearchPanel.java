@@ -8,8 +8,10 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 
 import com.margozzi.ancestry.Utility;
+import com.margozzi.ancestry.duplicate.ignore.Dialog;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -17,6 +19,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Properties;
 
@@ -27,20 +31,41 @@ public class SearchPanel extends JPanel {
     JSlider thresholdSlider;
     JButton browseButton;
     JButton searchButton;
+    JButton ignoreButton;
+    private IgnoreProvider ignoreProvider;
+    private SearchPanelListener listener;
 
     public SearchPanel(SearchPanelListener listener, Properties properties) {
         super(new GridBagLayout());
         this.properties = properties;
+        this.listener = listener;
 
         searchButton = new JButton("Search");
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (listener != null) {
-                    listener.handleSearch();
+                    listener.onSearch();
                 }
             }
         });
+
+        ignoreButton = new JButton("Ignored...");
+        ignoreButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Dialog ignoreDialog = new Dialog(ignoreProvider, SearchPanel.this);
+                ignoreDialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                ignoreDialog.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowDeactivated(WindowEvent e) {
+                        updateIgnoreButton();
+                    }
+                });
+                ignoreDialog.setVisible(true);
+            }
+        });
+        // updateIgnoreButton();
 
         JLabel fileLabel = new JLabel("File");
         fileLabel.setHorizontalAlignment(SwingConstants.LEFT);
@@ -49,9 +74,13 @@ public class SearchPanel extends JPanel {
         if (dir.equals("user.home") == false) {
             selectedFile = new File(dir);
             fileTextField = new JTextField(selectedFile.getName());
+            if (listener != null) {
+                listener.onFileChange(selectedFile);
+            }
         } else {
             fileTextField = new JTextField("Click the browse button -->");
             searchButton.setEnabled(false);
+            ignoreButton.setEnabled(false);
         }
         fileTextField.setEditable(false);
 
@@ -77,10 +106,16 @@ public class SearchPanel extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
-        c.gridwidth = 4;
+        c.gridwidth = 3;
         c.insets = insets;
         c.anchor = GridBagConstraints.PAGE_START;
         this.add(searchButton, c);
+
+        c = new GridBagConstraints();
+        c.gridx = 3;
+        c.gridy = 0;
+        c.insets = insets;
+        this.add(ignoreButton, c);
 
         c = new GridBagConstraints();
         c.gridx = 1;
@@ -117,8 +152,12 @@ public class SearchPanel extends JPanel {
         this.add(thresholdSlider, c);
     }
 
+    public void setIgnoreProvider(IgnoreProvider ignoreProvider) {
+        this.ignoreProvider = ignoreProvider;
+    }
+
     private void handleBrowse() {
-        browseButton.setEnabled((false));
+        // browseButton.setEnabled((false));
         JFileChooser fileChooser = new JFileChooser();
         String dir = this.properties.getProperty("lastFileDirectory");
         if (dir.equals("user.home")) {
@@ -132,8 +171,11 @@ public class SearchPanel extends JPanel {
             fileTextField.setText(selectedFile.getName());
             properties.setProperty("lastFileDirectory", selectedFile.getPath());
             searchButton.setEnabled(true);
+            if (listener != null) {
+                listener.onFileChange(selectedFile);
+            }
         }
-        browseButton.setEnabled((true));
+        updateIgnoreButton();
     }
 
     public File getSelectedFile() {
@@ -144,20 +186,15 @@ public class SearchPanel extends JPanel {
         return thresholdSlider.getValue() / 100.0;
     }
 
-    public void setEnabled(boolean enabled) {
-        searchButton.setEnabled(enabled);
-        browseButton.setEnabled(enabled);
-        thresholdSlider.setEnabled(enabled);
-    }
-
-    public void setBrowseButtonEnabled(boolean enable) {
-
-    }
-
     public static void main(String[] args) {
         JFrame frame = new JFrame();
         frame.getContentPane().add(new SearchPanel(null, Utility.getDefaultProperties()), BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
+    }
+
+    public void updateIgnoreButton() {
+        ignoreButton.setEnabled(ignoreProvider.getIgnoreIds() != null &&
+                ignoreProvider.getIgnoreIds().size() != 0);
     }
 }

@@ -1,13 +1,5 @@
 package com.margozzi.ancestry.duplicate;
 
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -17,13 +9,19 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+
 import com.margozzi.ancestry.model.Individual;
 
 public class IndividualPanel extends JPanel {
     private static Color girl = Color.PINK;
     private static Color boy = Color.CYAN;
     private static Color ignore = Color.GRAY;
-    private IgnoreListener listener;
+    private IgnoreProvider ignoreProvider;
     private String id;
 
     public IndividualPanel(Individual individual) {
@@ -42,8 +40,8 @@ public class IndividualPanel extends JPanel {
         ignore.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (listener != null) {
-                    listener.handleIgnore(id);
+                if (ignoreProvider != null) {
+                    ignoreProvider.addToIgnore(id);
                     textArea.setBackground(IndividualPanel.ignore);
                 }
             }
@@ -59,7 +57,7 @@ public class IndividualPanel extends JPanel {
         });
     }
 
-    public void setIgnoreListener(IgnoreListener listener) {
-        this.listener = listener;
+    public void setIgnoreProvider(IgnoreProvider provider) {
+        this.ignoreProvider = provider;
     }
 }

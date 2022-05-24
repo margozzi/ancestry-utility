@@ -179,9 +179,10 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener, I
             constraints.add(c);
             numDupsHolder.incrementAndGet();
 
-            System.out.println(match.getData().getKey() + ": " + match.getData() + "Matched: " + match
-                    .getMatchedWith().getKey() + ": " + match.getMatchedWith() + " Score: "
-                    + match.getScore().getResult());
+            // System.out.println(match.getData().getKey() + ": " + match.getData() +
+            // "Matched: " + match
+            // .getMatchedWith().getKey() + ": " + match.getMatchedWith() + " Score: "
+            // + match.getScore().getResult());
         });
 
         System.out.println("Duplicates: " + numDupsHolder.get());
@@ -324,11 +325,17 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener, I
         individual.setChildrenFirstNames(childrenFirstNames);
     }
 
-    @Override
-    public void onSearch() {
+    void clearResults() {
         if (resultScrollPane != null) {
             rightPanel.remove(resultScrollPane);
+            rightPanel.revalidate();
+            rightPanel.repaint();
         }
+    }
+
+    @Override
+    public void onSearch() {
+        clearResults();
         rightPanel.remove(msgLabel);
         msgLabel.setText("Searching...");
         GridBagConstraints c = new GridBagConstraints();
@@ -339,6 +346,7 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener, I
         c.fill = GridBagConstraints.BOTH;
         rightPanel.add(msgLabel, c);
         rightPanel.revalidate();
+        rightPanel.repaint();
 
         Thread t = new Thread() {
             public void run() {
@@ -352,24 +360,22 @@ public class DuplicatePanel extends JSplitPane implements SearchPanelListener, I
     @Override
     public void onFileChange(File file) {
 
-        Reader reader = new Reader(file);
-        reader.read();
-        individuals = reader.getIndividuals();
-        System.out.println("Individuals: " + individuals.size());
-        System.out.println("Males: " + reader.getCountMale());
-        System.out.println("Females: " + reader.getCountFemale());
+        if (file != null) {
+            Reader reader = new Reader(file);
+            reader.read();
+            individuals = reader.getIndividuals();
+            // System.out.println("Individuals: " + individuals.size());
+            // System.out.println("Males: " + reader.getCountMale());
+            // System.out.println("Females: " + reader.getCountFemale());
 
-        String path = file.getParent() + File.separator;
-        String baseFileName = file.getName().split("\\.")[0];
-        path += baseFileName;
-        path += ".ignore";
-        ignoreFile = new IgnoreFile(new File(path));
-        ignoreFile.read();
+            String path = file.getParent() + File.separator;
+            String baseFileName = file.getName().split("\\.")[0];
+            path += baseFileName;
+            path += ".ignore";
+            ignoreFile = new IgnoreFile(new File(path));
+            ignoreFile.read();
 
-        if (resultScrollPane != null) {
-            rightPanel.remove(resultScrollPane);
-            // Not working
-            rightPanel.revalidate();
+            clearResults();
         }
     }
 

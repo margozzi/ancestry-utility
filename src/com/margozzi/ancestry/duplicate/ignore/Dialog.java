@@ -9,7 +9,10 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+
 import javax.swing.table.AbstractTableModel;
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
@@ -18,7 +21,6 @@ import javax.swing.JTable;
 import com.margozzi.ancestry.duplicate.IgnoreProvider;
 
 public class Dialog extends JDialog {
-    // ImageIcon img = new ImageIcon("/images/people_32px.gif");
     Image image;
 
     public Dialog(IgnoreProvider ignore, Component parent) {
@@ -27,12 +29,12 @@ public class Dialog extends JDialog {
         setTitle("Ignored Individuals");
         setModal(true);
         setLocationRelativeTo(parent);
-        // try {
-        // // image = ImageIO.read(getClass().getResource("/images/people_32px.gif"));
-        // } catch (IOException e) {
-        // e.printStackTrace();
-        // }
-        // // setIconImage(image);
+        try {
+            image = ImageIO.read(getClass().getResource("/images/people_32px.gif"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        setIconImage(image);
 
         Container contentPane = getContentPane();
         contentPane.setLayout(new GridBagLayout());

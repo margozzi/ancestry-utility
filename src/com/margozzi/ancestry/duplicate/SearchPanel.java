@@ -65,7 +65,6 @@ public class SearchPanel extends JPanel {
                 ignoreDialog.setVisible(true);
             }
         });
-        // updateIgnoreButton();
 
         JLabel fileLabel = new JLabel("File");
         fileLabel.setHorizontalAlignment(SwingConstants.LEFT);
@@ -157,7 +156,6 @@ public class SearchPanel extends JPanel {
     }
 
     private void handleBrowse() {
-        // browseButton.setEnabled((false));
         JFileChooser fileChooser = new JFileChooser();
         String dir = this.properties.getProperty("lastFileDirectory");
         if (dir.equals("user.home")) {

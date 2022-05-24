@@ -3,6 +3,7 @@ package com.margozzi.ancestry;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -40,6 +42,13 @@ public class Utility {
         int xPosition = Integer.parseInt(properties.getProperty("xPosition"));
         int yPosition = Integer.parseInt(properties.getProperty("yPosition"));
 
+        Image image = null;
+        try {
+            image = ImageIO.read(getClass().getResource("/images/ancestry_32px.gif"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         // Create and set up the window.
         frame = new JFrame("Ancestry Utility");
         frame.getContentPane().setLayout(new GridBagLayout());
@@ -47,6 +56,7 @@ public class Utility {
         frame.setLocation(xPosition, yPosition);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setJMenuBar(buildMenu());
+        frame.setIconImage(image);
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -159,7 +169,7 @@ public class Utility {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            System.out.println("Unable to set the look anf feel");
+            System.out.println("Unable to set the look and feel");
         }
         Utility utility = new Utility();
         utility.loadApplicationProperties();
